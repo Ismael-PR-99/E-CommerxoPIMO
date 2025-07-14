@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 
 interface CartItem {
@@ -13,11 +13,6 @@ const Store: React.FC = () => {
   const { products, updateProductStock } = useStore();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
-  
-  // Log temporal para debug
-  useEffect(() => {
-    console.log('🛒 Store - Products updated:', products.length, 'products');
-  }, [products]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -106,9 +101,7 @@ const Store: React.FC = () => {
     }
     
     // Actualizar el stock de todos los productos en el carrito
-    console.log('Cart before checkout:', cart);
     cart.forEach(item => {
-      console.log(`Calling updateProductStock for product ${item.id}, quantity ${item.quantity}`);
       updateProductStock(item.id, item.quantity);
     });
     

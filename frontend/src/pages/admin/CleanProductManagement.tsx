@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../../store/useStore';
 
 const CleanProductManagement: React.FC = () => {
@@ -6,12 +6,6 @@ const CleanProductManagement: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Log temporal para debug
-  useEffect(() => {
-    console.log('🏪 Admin - Products updated:', products.length, 'products');
-    products.forEach(p => console.log(`📦 ${p.name}: Stock ${p.stock}`));
-  }, [products]);
 
   const [formData, setFormData] = useState({
     name: '',
