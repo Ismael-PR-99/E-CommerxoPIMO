@@ -6,12 +6,19 @@ import com.ecommerxo.api.repository.InventoryRepository;
 import com.ecommerxo.api.dto.ProductDTO;
 import com.ecommerxo.api.model.Inventory;
 import com.ecommerxo.api.exception.ResourceNotFoundException;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,17 +28,27 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final InventoryRepository inventoryRepository;
 
+    @Cacheable(value = "products", key = "'all'")
     public List<ProductDTO> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
+    // Método paginado optimizado
+    public Page<ProductDTO> getAllProductsPaginated(Pageable pageable) {
+        return productRepository.findAll(pageable)
+                .map(this::convertToDTO);
+    }
+
+    @Cacheable(value = "products", key = "#id")
     public ProductDTO getProduct(UUID id) {
         return convertToDTO(findProductById(id));
     }
 
     @Transactional
+    @CachePut(value = "products", key = "#result.id")
+    @CacheEvict(value = "products", key = "'all'")
     public ProductDTO createProduct(ProductDTO productDTO) {
         Product product = convertToEntity(productDTO);
         product = productRepository.save(product);
@@ -39,6 +56,8 @@ public class ProductService {
     }
 
     @Transactional
+    @CachePut(value = "products", key = "#id")
+    @CacheEvict(value = "products", key = "'all'")
     public ProductDTO updateProduct(UUID id, ProductDTO productDTO) {
         Product product = findProductById(id);
         updateProductFromDTO(product, productDTO);
@@ -47,11 +66,21 @@ public class ProductService {
     }
 
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(UUID id) {
         Product product = findProductById(id);
         productRepository.delete(product);
     }
 
+    @Async
+    public CompletableFuture<Void> updateProductStockAsync(UUID productId, int newStock) {
+        Product product = findProductById(productId);
+        // Actualizar el stock del producto de forma asíncrona
+        // Esto podría incluir notificaciones, logs, etc.
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Cacheable(value = "products", key = "'lowStock'")
     public List<ProductDTO> getLowStockProducts() {
         return productRepository.findByStockQuantityLessThanMinStockLevel().stream()
                 .map(this::convertToDTO)
