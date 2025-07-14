@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store/useStore.ts';
+import type { Product } from '../types';
 
 const Inventory = () => {
   const { products } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out'>('all');
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product: Product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -73,13 +74,13 @@ const Inventory = () => {
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-gray-700">Stock Bajo</h3>
           <p className="text-3xl font-bold text-yellow-600">
-            {products.filter(p => p.stock <= 10 && p.stock > 0).length}
+            {products.filter((p: Product) => p.stock <= 10 && p.stock > 0).length}
           </p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-gray-700">Agotados</h3>
           <p className="text-3xl font-bold text-red-600">
-            {products.filter(p => p.stock === 0).length}
+            {products.filter((p: Product) => p.stock === 0).length}
           </p>
         </div>
       </div>
@@ -111,7 +112,7 @@ const Inventory = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredProducts.map((product) => {
+              {filteredProducts.map((product: Product) => {
                 const stockStatus = getStockStatus(product.stock);
                 return (
                   <tr key={product.id} className="hover:bg-gray-50">

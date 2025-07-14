@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store/useStore.ts';
+import type { Product } from '../types';
 
 const ProductList = () => {
     const { products } = useStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('');
 
-    const filteredProducts = products.filter(product => {
+    const filteredProducts = products.filter((product: Product) => {
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             product.sku.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = !selectedCategory || product.category === selectedCategory;
@@ -34,7 +35,7 @@ const ProductList = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map(product => (
+                {filteredProducts.map((product: Product) => (
                     <div
                         key={product.id}
                         className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"

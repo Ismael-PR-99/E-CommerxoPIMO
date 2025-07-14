@@ -1,70 +1,70 @@
 import { useState, useMemo, memo, useCallback } from 'react';
-import { useStore } from '../store/useStore';
-import { usePagination } from '../hooks/useOptimization';
-import { useDebounce } from '../hooks/useDebounce';
+import { ChevronUpIcon, ChevronDownIcon, EyeIcon, UserIcon } from '@heroicons/react/24/outline';
+import { Badge } from '../components/ui/Badge.tsx';
+import { Card } from '../components/ui/Card.tsx';
+import type { Order } from '../types';
+import { useStore } from '../store/useStore.ts';
+import { useDebounce } from '../hooks/useDebounce.ts';
+import { usePagination } from '../hooks/usePagination.ts';
 
-interface Order {
-  id: number;
-  customerName: string;
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered';
-  date: string;
-  items: Array<{
-    id: number;
-    name: string;
-    quantity: number;
-    price: number;
-  }>;
-}
-
-// Componente memoizado para las filas de la tabla
+// Memoized OrderRow component
 const OrderRow = memo(({ order, onViewDetails, onUpdateStatus }: {
   order: Order;
   onViewDetails: (id: number) => void;
-  onUpdateStatus: (id: number) => void;
+  onUpdateStatus: (id: number, status: string) => void;
 }) => {
   const getStatusColor = (status: Order['status']) => {
-    const colors = {
+    const colors: Record<Order['status'], string> = {
       pending: 'bg-yellow-100 text-yellow-800',
       processing: 'bg-blue-100 text-blue-800',
       shipped: 'bg-purple-100 text-purple-800',
-      delivered: 'bg-green-100 text-green-800'
+      delivered: 'bg-green-100 text-green-800',
     };
     return colors[status];
   };
 
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-gray-50 transition-colors">
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         #{order.id}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        {order.customerName}
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center">
+          <UserIcon className="h-5 w-5 text-gray-400 mr-2" />
+          <span className="text-sm text-gray-900">{order.customerName}</span>
+        </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
         ${order.total.toFixed(2)}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
+        <Badge className={getStatusColor(order.status)}>
           {order.status}
-        </span>
+        </Badge>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
         {new Date(order.date).toLocaleDateString()}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button 
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {order.items.length} item{order.items.length !== 1 ? 's' : ''}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button
           onClick={() => onViewDetails(order.id)}
-          className="text-blue-600 hover:text-blue-900 mr-3"
+          className="text-indigo-600 hover:text-indigo-900 mr-4"
         >
-          Ver detalles
+          <EyeIcon className="h-5 w-5" />
         </button>
-        <button 
-          onClick={() => onUpdateStatus(order.id)}
-          className="text-green-600 hover:text-green-900"
+        <select
+          value={order.status}
+          onChange={(e) => onUpdateStatus(order.id, e.target.value)}
+          className="text-sm border-gray-300 rounded-md"
         >
-          Actualizar estado
-        </button>
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+        </select>
       </td>
     </tr>
   );
@@ -72,123 +72,167 @@ const OrderRow = memo(({ order, onViewDetails, onUpdateStatus }: {
 
 OrderRow.displayName = 'OrderRow';
 
-const Orders = () => {
-  const { orders } = useStore();
+export default function Orders() {
+  const { orders, updateOrderStatus } = useStore();
+  const [sortBy, setSortBy] = useState<'date' | 'total' | 'status'>('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [filter, setFilter] = useState<'all' | 'pending' | 'processing' | 'shipped' | 'delivered'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // Filtros optimizados con useMemo
+  // Filtered and sorted orders
   const filteredOrders = useMemo(() => {
-    return orders.filter((order: Order) => {
-      const matchesFilter = filter === 'all' || order.status === filter;
-      const matchesSearch = !debouncedSearchTerm || 
+    let filtered: Order[] = orders;
+
+    // Apply status filter
+    if (filter !== 'all') {
+      filtered = filtered.filter((order: Order) => order.status === filter);
+    }
+
+    // Apply search filter
+    if (debouncedSearchTerm) {
+      filtered = filtered.filter((order: Order) =>
         order.customerName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        order.id.toString().includes(debouncedSearchTerm);
+        order.id.toString().includes(debouncedSearchTerm)
+      );
+    }
+
+    // Apply sorting
+    return filtered.sort((a: Order, b: Order) => {
+      let aValue: any, bValue: any;
       
-      return matchesFilter && matchesSearch;
+      switch (sortBy) {
+        case 'date':
+          aValue = new Date(a.date);
+          bValue = new Date(b.date);
+          break;
+        case 'total':
+          aValue = a.total;
+          bValue = b.total;
+          break;
+        case 'status':
+          aValue = a.status;
+          bValue = b.status;
+          break;
+        default:
+          return 0;
+      }
+      
+      if (sortDirection === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
     });
-  }, [orders, filter, debouncedSearchTerm]);
+  }, [orders, filter, debouncedSearchTerm, sortBy, sortDirection]);
 
-  // Paginación
-  const ITEMS_PER_PAGE = 10;
-  const pagination = usePagination({
-    totalItems: filteredOrders.length,
-    itemsPerPage: ITEMS_PER_PAGE
-  });
+  // Pagination
+  const { currentPage, totalPages, paginatedItems: paginatedOrders, goToPage } = usePagination(filteredOrders, 10);
 
-  const paginatedOrders = useMemo(() => {
-    return filteredOrders.slice(pagination.startIndex, pagination.endIndex);
-  }, [filteredOrders, pagination.startIndex, pagination.endIndex]);
-
-  // Callbacks memoizados
   const handleViewDetails = useCallback((id: number) => {
-    console.log('Ver detalles de orden:', id);
-    // TODO: Implementar modal o navegación a detalles
+    console.log('Viewing order details for:', id);
+    // TODO: Implement order details view
   }, []);
 
-  const handleUpdateStatus = useCallback((id: number) => {
-    console.log('Actualizar estado de orden:', id);
-    // TODO: Implementar actualización de estado
-  }, []);
+  const handleUpdateStatus = useCallback((id: number, status: string) => {
+    updateOrderStatus(id, status as Order['status']);
+  }, [updateOrderStatus]);
 
-  const handleFilterChange = useCallback((newFilter: typeof filter) => {
-    setFilter(newFilter);
-    pagination.reset();
-  }, [pagination]);
+  const handleSort = useCallback((field: 'date' | 'total' | 'status') => {
+    if (sortBy === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortDirection('desc');
+    }
+  }, [sortBy]);
+
+  const SortIcon = ({ field }: { field: string }) => {
+    if (sortBy !== field) return <ChevronUpIcon className="h-4 w-4 text-gray-400" />;
+    return sortDirection === 'asc' ? 
+      <ChevronUpIcon className="h-4 w-4 text-gray-600" /> : 
+      <ChevronDownIcon className="h-4 w-4 text-gray-600" />;
+  };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Órdenes</h1>
-        
-        <div className="flex space-x-4 items-center">
-          {/* Barra de búsqueda */}
-          <div className="relative">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
+      </div>
+
+      {/* Filters and Search */}
+      <Card className="p-6">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
             <input
               type="text"
-              placeholder="Buscar por cliente o ID..."
+              placeholder="Search orders by customer name or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-            {debouncedSearchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
-              >
-                ×
-              </button>
-            )}
           </div>
-
-          {/* Filtros de estado */}
-          <div className="flex space-x-2">
-            {['all', 'pending', 'processing', 'shipped', 'delivered'].map((status) => (
-              <button
-                key={status}
-                onClick={() => handleFilterChange(status as any)}
-                className={`px-4 py-2 rounded capitalize transition-colors ${
-                  filter === status
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {status === 'all' ? 'Todas' : status}
-              </button>
-            ))}
+          <div>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as any)}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="all">All Orders</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+            </select>
           </div>
         </div>
-      </div>
+      </Card>
 
-      {/* Información de resultados */}
-      <div className="mb-4 text-sm text-gray-600">
-        Mostrando {paginatedOrders.length} de {filteredOrders.length} órdenes
-        {debouncedSearchTerm && ` (filtrado por "${debouncedSearchTerm}")`}
-      </div>
-
-      <div className="bg-white rounded-lg shadow">
+      {/* Orders Table */}
+      <Card>
         <div className="overflow-x-auto">
-          <table className="w-full table-auto">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
+                  Order ID
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Cliente
+                  Customer
+                </th>
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('total')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Total</span>
+                    <SortIcon field="total" />
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('status')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Status</span>
+                    <SortIcon field="status" />
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('date')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Date</span>
+                    <SortIcon field="date" />
+                  </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total
+                  Items
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Fecha
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -205,61 +249,36 @@ const Orders = () => {
           </table>
         </div>
 
-        {/* Paginación */}
-        {pagination.totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Página {pagination.currentPage} de {pagination.totalPages}
-            </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={pagination.goToPrevious}
-                disabled={!pagination.hasPrevious}
-                className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Anterior
-              </button>
-              
-              {/* Números de página */}
-              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                const pageNum = i + 1;
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => pagination.goToPage(pageNum)}
-                    className={`px-3 py-1 border rounded ${
-                      pagination.currentPage === pageNum
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-              
-              <button
-                onClick={pagination.goToNext}
-                disabled={!pagination.hasNext}
-                className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Siguiente
-              </button>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-6 py-3 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                Showing {paginatedOrders.length} of {filteredOrders.length} orders
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Previous
+                </button>
+                <span className="px-3 py-1 text-sm">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
         )}
-      </div>
-
-      {/* Estado vacío */}
-      {filteredOrders.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-500 text-lg">
-            {debouncedSearchTerm ? 'No se encontraron órdenes con esos criterios' : 'No hay órdenes disponibles'}
-          </div>
-        </div>
-      )}
+      </Card>
     </div>
   );
-};
-
-export default Orders;
+}

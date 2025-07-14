@@ -75,6 +75,11 @@ export interface DashboardMetrics {
   totalRevenue: number;
   lowStockProducts: number;
   pendingOrders: number;
+  monthlyStats?: Array<{
+    month: string;
+    orders: number;
+    revenue: number;
+  }>;
 }
 
 // API Response types

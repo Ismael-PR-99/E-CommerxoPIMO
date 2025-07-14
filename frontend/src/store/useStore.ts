@@ -1,35 +1,5 @@
 import { create } from 'zustand';
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  sku: string;
-  category: string;
-  imageUrl: string;
-}
-
-interface Order {
-  id: number;
-  customerName: string;
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered';
-  date: string;
-  items: Array<{
-    id: number;
-    name: string;
-    quantity: number;
-    price: number;
-  }>;
-}
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
+import type { Product, Order, User } from '../types';
 
 interface Store {
   // State
@@ -41,6 +11,7 @@ interface Store {
   addProduct: (product: Product) => void;
   updateProduct: (product: Product) => void;
   deleteProduct: (id: number) => void;
+  updateOrderStatus: (id: number, status: Order['status']) => void;
   setUser: (user: User) => void;
 }
 
@@ -146,7 +117,8 @@ const sampleOrders: Order[] = [
 const sampleUser: User = {
   id: 1,
   name: "Administrador",
-  email: "admin@ecommerxo.com"
+  email: "admin@ecommerxo.com",
+  role: "ADMIN"
 };
 
 export const useStore = create<Store>((set) => ({
@@ -171,6 +143,13 @@ export const useStore = create<Store>((set) => ({
   deleteProduct: (id: number) =>
     set((state) => ({
       products: state.products.filter((product) => product.id !== id)
+    })),
+    
+  updateOrderStatus: (id: number, status: Order['status']) =>
+    set((state) => ({
+      orders: state.orders.map((order) =>
+        order.id === id ? { ...order, status } : order
+      )
     })),
     
   setUser: (user: User) =>

@@ -1,13 +1,13 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
-import Layout from './components/layout/Layout'
-import Dashboard from './pages/Dashboard'
-import ProductsPage from './pages/Products'
-import OrdersPage from './pages/Orders'
-import InventoryPage from './pages/Inventory'
-import LoginPage from './pages/Login'
-import RegisterPage from './pages/Register'
-import NotFoundPage from './pages/NotFound'
+import Layout from './components/layout/Layout.tsx'
+import Dashboard from './pages/Dashboard.tsx'
+import ProductsPage from './pages/Products.tsx'
+import OrdersPage from './pages/Orders.tsx'
+import InventoryPage from './pages/Inventory.tsx'
+import LoginPage from './pages/Login.tsx'
+import RegisterPage from './pages/Register.tsx'
+import NotFoundPage from './pages/NotFound.tsx'
 
 function App() {
   const { isAuthenticated } = useAuth()
