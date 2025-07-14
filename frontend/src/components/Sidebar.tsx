@@ -1,70 +1,113 @@
-import { useState } from 'react';
-import { useStore } from '../store/useStore.ts';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 
-const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
-  const { user } = useStore();
-
-  const navigation = [
-    { name: 'Dashboard', href: '/', icon: '📊' },
-    { name: 'Productos', href: '/productos', icon: '📦' },
-    { name: 'Órdenes', href: '/ordenes', icon: '📋' },
-    { name: 'Inventario', href: '/inventario', icon: '📈' },
-    { name: 'ML Analytics', href: '/analytics', icon: '🤖' },
+const Sidebar: React.FC = () => {
+  const navItems = [
+    {
+      name: 'Dashboard',
+      path: '/',
+      icon: (
+        <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Productos',
+      path: '/products',
+      icon: (
+        <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Órdenes',
+      path: '/orders',
+      icon: (
+        <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Inventario',
+      path: '/inventory',
+      icon: (
+        <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Clientes',
+      path: '/customers',
+      icon: (
+        <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Análisis',
+      path: '/analytics',
+      icon: (
+        <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
   ];
 
   return (
-    <div className={`bg-gray-800 text-white transition-all duration-300 ${
-      isOpen ? 'w-64' : 'w-16'
-    }`}>
-      <div className="p-4">
-        <div className="flex items-center justify-between">
-          <h1 className={`text-xl font-bold ${isOpen ? 'block' : 'hidden'}`}>
-            E-CommerxoPIMO
-          </h1>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600"
-          >
-            {isOpen ? '←' : '→'}
-          </button>
+    <aside className="glass-card" style={{
+      width: '256px',
+      height: '100vh',
+      position: 'sticky',
+      top: 0,
+      padding: '24px 0'
+    }}>
+      <div style={{ padding: '0 24px', marginBottom: '32px' }}>
+        <div style={{
+          fontSize: '20px',
+          fontWeight: '700',
+          background: 'linear-gradient(to right, #3b82f6, #9333ea)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}>
+          E-CommerxoPIMO
         </div>
       </div>
 
-      <nav className="mt-8">
-        <ul className="space-y-2 px-4">
-          {navigation.map((item) => (
-            <li key={item.name}>
-              <a
-                href={item.href}
-                className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors"
+      <nav>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {navItems.map((item) => (
+            <li key={item.path} style={{ marginBottom: '4px' }}>
+              <NavLink
+                to={item.path}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 24px',
+                  color: isActive ? '#3b82f6' : '#64748b',
+                  backgroundColor: isActive ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: isActive ? '500' : '400',
+                  transition: 'all 0.3s ease',
+                  borderRight: isActive ? '3px solid #3b82f6' : '3px solid transparent'
+                })}
               >
-                <span className="text-xl">{item.icon}</span>
-                {isOpen && (
-                  <span className="ml-3 text-sm font-medium">{item.name}</span>
-                )}
-              </a>
+                {item.icon}
+                {item.name}
+              </NavLink>
             </li>
           ))}
         </ul>
       </nav>
-
-      {isOpen && user && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gray-900">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-sm font-bold">
-                {user.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium">{user.name}</p>
-              <p className="text-xs text-gray-400">{user.email}</p>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </aside>
   );
 };
 

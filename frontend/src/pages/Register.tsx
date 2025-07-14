@@ -1,186 +1,229 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-interface RegisterForm {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-const Register = () => {
-  const navigate = useNavigate();
-  const [form, setForm] = useState<RegisterForm>({
+const Register: React.FC = () => {
+  const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({
-      ...form,
+    setFormData(prev => ({
+      ...prev,
       [e.target.name]: e.target.value
-    });
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     setError('');
 
-    // Validaciones básicas
-    if (form.password !== form.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
-      setLoading(false);
-      return;
-    }
-
-    if (form.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName: form.fullName,
-          email: form.email,
-          password: form.password
-        }),
+      // Simular registro para demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      login('demo-token', { 
+        id: 1, 
+        email: formData.email, 
+        fullName: formData.fullName 
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Guardar token en localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        // Redirigir al dashboard
-        navigate('/');
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Error al registrarse');
-      }
+      navigate('/dashboard');
     } catch (error) {
-      setError('Error de conexión. Intenta de nuevo.');
+      console.error('Registration failed:', error);
+      setError('Error al crear la cuenta. Intenta de nuevo.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            E-CommerxoPIMO
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Crea tu cuenta
-          </p>
-        </div>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
+    <div className="page-background">
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px'
+      }}>
+        <div className="glass-card" style={{
+          width: '100%',
+          maxWidth: '450px',
+          padding: '48px 32px'
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <div style={{
+              fontSize: '28px',
+              fontWeight: '700',
+              background: 'linear-gradient(to right, #3b82f6, #9333ea)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              marginBottom: '8px'
+            }}>
+              E-CommerxoPIMO
+            </div>
+            <p style={{ color: '#64748b', fontSize: '16px' }}>
+              Crea tu cuenta
+            </p>
           </div>
-        )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+          {error && (
+            <div style={{
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              color: '#dc2626',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              marginBottom: '24px',
+              fontSize: '14px'
+            }}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>
                 Nombre completo
               </label>
               <input
-                id="fullName"
-                name="fullName"
                 type="text"
-                required
-                value={form.fullName}
+                name="fullName"
+                value={formData.fullName}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="input-field"
                 placeholder="Tu nombre completo"
+                required
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>
                 Email
               </label>
               <input
-                id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
-                value={form.email}
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="input-field"
                 placeholder="tu@email.com"
+                required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>
                 Contraseña
               </label>
               <input
-                id="password"
-                name="password"
                 type="password"
-                required
-                value={form.password}
+                name="password"
+                value={formData.password}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Mínimo 6 caracteres"
+                className="input-field"
+                placeholder="••••••••"
+                required
               />
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>
                 Confirmar contraseña
               </label>
               <input
-                id="confirmPassword"
-                name="confirmPassword"
                 type="password"
-                required
-                value={form.confirmPassword}
+                name="confirmPassword"
+                value={formData.confirmPassword}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Repite tu contraseña"
+                className="input-field"
+                placeholder="••••••••"
+                required
               />
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="btn-primary"
+              disabled={isLoading}
+              style={{
+                width: '100%',
+                height: '48px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '8px'
+              }}
             >
-              {loading ? 'Registrando...' : 'Crear cuenta'}
+              {isLoading && (
+                <div className="animate-spin" style={{
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid rgba(255, 255, 255, 0.3)',
+                  borderTopColor: 'white',
+                  borderRadius: '50%'
+                }} />
+              )}
+              {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
             </button>
-          </div>
+          </form>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              ¿Ya tienes cuenta?{' '}
-              <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-                Inicia sesión aquí
-              </Link>
-            </p>
+          <div style={{
+            textAlign: 'center',
+            marginTop: '32px',
+            fontSize: '14px',
+            color: '#64748b'
+          }}>
+            ¿Ya tienes cuenta?{' '}
+            <Link
+              to="/login"
+              style={{
+                color: '#3b82f6',
+                textDecoration: 'none',
+                fontWeight: '500'
+              }}
+            >
+              Inicia sesión
+            </Link>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

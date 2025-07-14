@@ -1,144 +1,146 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const Login = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
+const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Usar el contexto de autenticación para login
-        login(data.token, data.user);
-        
-        // Redirigir al dashboard
-        navigate('/');
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Credenciales inválidas');
-      }
+      // Simular login para demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      login('demo-token', { id: 1, email, fullName: 'Usuario Demo' });
+      navigate('/dashboard');
     } catch (error) {
-      setError('Error de conexión. Intenta de nuevo.');
+      console.error('Login failed:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            E-CommerxoPIMO
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Inicia sesión en tu cuenta
-          </p>
-        </div>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
+    <div className="page-background">
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px'
+      }}>
+        <div className="glass-card" style={{
+          width: '100%',
+          maxWidth: '400px',
+          padding: '48px 32px'
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <div style={{
+              fontSize: '28px',
+              fontWeight: '700',
+              background: 'linear-gradient(to right, #3b82f6, #9333ea)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              marginBottom: '8px'
+            }}>
+              E-CommerxoPIMO
+            </div>
+            <p style={{ color: '#64748b', fontSize: '16px' }}>
+              Bienvenido de vuelta
+            </p>
           </div>
-        )}
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div>
-              <label htmlFor="email" className="sr-only">
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>
                 Email
               </label>
               <input
-                id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Dirección de email"
+                className="input-field"
+                placeholder="tu@email.com"
+                required
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>
                 Contraseña
               </label>
               <input
-                id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Contraseña"
+                className="input-field"
+                placeholder="••••••••"
+                required
               />
             </div>
-          </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                Recordarme
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
-          </div>
-
-          <div>
             <button
               type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="btn-primary"
+              disabled={isLoading}
+              style={{
+                width: '100%',
+                height: '48px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+              {isLoading && (
+                <div className="animate-spin" style={{
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid rgba(255, 255, 255, 0.3)',
+                  borderTopColor: 'white',
+                  borderRadius: '50%'
+                }} />
+              )}
+              {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
-          </div>
+          </form>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              ¿No tienes cuenta?{' '}
-              <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-                Regístrate aquí
-              </Link>
-            </p>
+          <div style={{
+            textAlign: 'center',
+            marginTop: '32px',
+            fontSize: '14px',
+            color: '#64748b'
+          }}>
+            ¿No tienes cuenta?{' '}
+            <Link
+              to="/register"
+              style={{
+                color: '#3b82f6',
+                textDecoration: 'none',
+                fontWeight: '500'
+              }}
+            >
+              Regístrate
+            </Link>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

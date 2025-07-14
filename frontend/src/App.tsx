@@ -1,5 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
+import { Routes, Route } from 'react-router-dom'
 import Layout from './components/layout/Layout.tsx'
 import Dashboard from './pages/Dashboard.tsx'
 import ProductsPage from './pages/Products.tsx'
@@ -10,19 +9,14 @@ import RegisterPage from './pages/Register.tsx'
 import NotFoundPage from './pages/NotFound.tsx'
 
 function App() {
-  const { isAuthenticated } = useAuth()
-  
   return (
     <Routes>
       {/* Rutas públicas */}
-      <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" replace />} />
-      <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/" replace />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       
-      {/* Rutas protegidas */}
-      <Route 
-        path="/" 
-        element={isAuthenticated ? <Layout /> : <Navigate to="/login" replace />}
-      >
+      {/* Rutas principales - temporalmente sin autenticación para demo */}
+      <Route path="/" element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="orders" element={<OrdersPage />} />
