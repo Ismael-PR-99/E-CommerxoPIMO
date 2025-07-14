@@ -76,13 +76,26 @@ const SimpleProductManagement: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-      {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '32px', color: '#333', margin: '0 0 8px 0', fontWeight: '700' }}>
+    <div style={{ 
+      padding: '24px', 
+      maxWidth: '1400px', 
+      margin: '0 auto',
+      minHeight: '100vh'
+    }}>
+      {/* Header mejorado */}
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ 
+          fontSize: '32px', 
+          color: '#1f2937', 
+          margin: '0 0 8px 0', 
+          fontWeight: '700',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
           🏪 Gestión de Productos
         </h1>
-        <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>
+        <p style={{ color: '#6b7280', fontSize: '16px', margin: 0 }}>
           Administra el inventario de tu tienda
         </p>
       </div>
@@ -326,10 +339,14 @@ const SimpleProductManagement: React.FC = () => {
             key={product.id} 
             className="glass-card" 
             style={{
-              padding: '20px',
-              border: product.stock <= 10 ? '2px solid #EF444450' : '2px solid transparent',
+              padding: '24px',
+              border: product.stock <= 10 ? '2px solid #EF444450' : '2px solid #e5e7eb',
+              borderRadius: '12px',
+              background: '#ffffff',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
               transition: 'all 0.3s ease',
-              position: 'relative'
+              position: 'relative',
+              cursor: 'pointer'
             }}
           >
             {product.stock <= 10 && (
@@ -337,12 +354,13 @@ const SimpleProductManagement: React.FC = () => {
                 position: 'absolute',
                 top: '12px',
                 right: '12px',
-                background: '#EF4444',
+                background: 'linear-gradient(135deg, #EF4444, #DC2626)',
                 color: 'white',
-                padding: '4px 8px',
-                borderRadius: '6px',
+                padding: '6px 12px',
+                borderRadius: '20px',
                 fontSize: '12px',
-                fontWeight: '600'
+                fontWeight: '600',
+                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.3)'
               }}>
                 ⚠️ Stock Bajo
               </div>
@@ -423,20 +441,25 @@ const SimpleProductManagement: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
               <button
                 onClick={() => handleEdit(product)}
                 style={{
                   flex: 1,
-                  padding: '10px 16px',
+                  padding: '12px 16px',
                   background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
                   fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.3s ease'
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
                 }}
               >
                 ✏️ Editar
@@ -449,15 +472,20 @@ const SimpleProductManagement: React.FC = () => {
                 }}
                 style={{
                   flex: 1,
-                  padding: '10px 16px',
+                  padding: '12px 16px',
                   background: 'linear-gradient(135deg, #EF4444, #DC2626)',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
                   fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.3s ease'
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 2px 4px rgba(239, 68, 68, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
                 }}
               >
                 🗑️ Eliminar

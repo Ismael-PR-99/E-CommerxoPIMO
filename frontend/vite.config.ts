@@ -14,7 +14,31 @@ export default defineConfig({
     }
   },
   server: {
+    host: '0.0.0.0', // Permite acceso desde cualquier IP de la red local
     port: 5173,
-    cors: true
+    strictPort: true, // No cambiar puerto automáticamente
+    cors: true,
+    open: true, // Abrir navegador automáticamente
+    hmr: {
+      host: 'localhost' // Hot module replacement
+    }
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          store: ['zustand']
+        }
+      }
+    }
   }
 })

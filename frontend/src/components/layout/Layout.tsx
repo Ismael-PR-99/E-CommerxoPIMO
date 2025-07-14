@@ -17,17 +17,18 @@ const Layout: React.FC = () => {
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
-          overflow: 'hidden'
+          minHeight: '100vh'
         }}>
           <Header />
           <main style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '24px'
+            padding: '24px',
+            maxHeight: 'calc(100vh - 80px)'
           }}>
             <div className="glass-card" style={{
               padding: '32px',
-              minHeight: '100%'
+              minHeight: 'auto'
             }}>
               <Outlet />
             </div>

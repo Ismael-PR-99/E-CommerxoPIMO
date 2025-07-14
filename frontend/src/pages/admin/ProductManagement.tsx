@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../store/useStore';
-import { Product as StoreProduct } from '../../types';
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: string;
-  image: string;
-  featured: boolean;
-  sku: string;
-}
+import { Product } from '../../types';
 
 interface NewProduct {
   name: string;
@@ -20,8 +8,6 @@ interface NewProduct {
   price: string;
   stock: string;
   category: string;
-  image: string;
-  featured: boolean;
 }
 
 const ProductManagement: React.FC = () => {
@@ -123,28 +109,34 @@ const ProductManagement: React.FC = () => {
     setShowAddForm(false);
   };
 
-  const ProductCard = ({ product }: { product: Product }) => (
+  const ProductCard = ({ product }: { product: StoreProduct }) => (
     <div className="glass-card" style={{
-      padding: '20px',
+      padding: '24px',
       display: 'flex',
       flexDirection: 'column',
       gap: '16px',
       position: 'relative',
-      border: product.stock <= 10 ? '2px solid #EF444450' : '1px solid #e9ecef'
+      border: product.stock <= 10 ? '2px solid #EF444450' : '1px solid #e2e8f0',
+      borderRadius: '12px',
+      background: '#ffffff',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      transition: 'all 0.3s ease',
+      cursor: 'pointer'
     }}>
       {product.stock <= 10 && (
         <div style={{
           position: 'absolute',
-          top: '8px',
-          right: '8px',
-          background: '#EF4444',
+          top: '12px',
+          right: '12px',
+          background: 'linear-gradient(135deg, #EF4444, #DC2626)',
           color: 'white',
-          padding: '4px 8px',
-          borderRadius: '4px',
+          padding: '6px 12px',
+          borderRadius: '20px',
           fontSize: '12px',
-          fontWeight: '500'
+          fontWeight: '600',
+          boxShadow: '0 2px 4px rgba(239, 68, 68, 0.3)'
         }}>
-          Stock Bajo
+          ⚠️ Stock Bajo
         </div>
       )}
       
@@ -432,13 +424,26 @@ const ProductManagement: React.FC = () => {
   );
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '32px', color: '#333', margin: '0 0 8px 0', fontWeight: '700' }}>
+    <div style={{ 
+      padding: '24px', 
+      maxWidth: '1400px', 
+      margin: '0 auto',
+      minHeight: '100vh'
+    }}>
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ 
+          fontSize: '32px', 
+          color: '#1f2937', 
+          margin: '0 0 8px 0', 
+          fontWeight: '700',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
           📦 Gestión de Productos
         </h1>
-        <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>
-          Administra el catálogo de tu tienda
+        <p style={{ color: '#6b7280', fontSize: '16px', margin: 0 }}>
+          Administra el catálogo de productos de tu tienda
         </p>
       </div>
 

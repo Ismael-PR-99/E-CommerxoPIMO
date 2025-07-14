@@ -10,7 +10,8 @@ import LoginPage from './pages/Login.tsx'
 import RegisterPage from './pages/Register.tsx'
 import NotFoundPage from './pages/NotFound.tsx'
 import AdminDashboard from './pages/admin/AdminDashboard.tsx'
-import SimpleProductManagement from './pages/admin/SimpleProductManagement.tsx'
+import CleanProductManagement from './pages/admin/CleanProductManagement.tsx'
+import Store from './pages/Store.tsx'
 
 function App() {
   return (
@@ -18,6 +19,9 @@ function App() {
       {/* Rutas públicas */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      
+      {/* Tienda Externa - Sin Layout */}
+      <Route path="/store" element={<Store />} />
       
       {/* Rutas principales - temporalmente sin autenticación para demo */}
       <Route path="/" element={<Layout />}>
@@ -29,7 +33,7 @@ function App() {
         <Route path="analytics" element={<AnalyticsPage />} />
         {/* Rutas de administración */}
         <Route path="admin" element={<AdminDashboard />} />
-        <Route path="admin/products" element={<SimpleProductManagement />} />
+        <Route path="admin/products" element={<CleanProductManagement />} />
       </Route>
       
       {/* 404 */}

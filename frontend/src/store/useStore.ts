@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Product, Order, User } from '../types';
 
 interface Store {
@@ -11,6 +12,7 @@ interface Store {
   addProduct: (product: Product) => void;
   updateProduct: (product: Product) => void;
   deleteProduct: (id: number) => void;
+  updateProductStock: (id: number, quantity: number) => void;
   updateOrderStatus: (id: number, status: Order['status']) => void;
   setUser: (user: User) => void;
 }
@@ -121,39 +123,71 @@ const sampleUser: User = {
   role: "ADMIN"
 };
 
-export const useStore = create<Store>((set) => ({
-  // Initial state
-  products: sampleProducts,
-  orders: sampleOrders,
-  user: sampleUser,
-  
-  // Actions
-  addProduct: (product: Product) =>
-    set((state) => ({
-      products: [...state.products, product]
-    })),
-    
-  updateProduct: (updatedProduct: Product) =>
-    set((state) => ({
-      products: state.products.map((product) =>
-        product.id === updatedProduct.id ? updatedProduct : product
-      )
-    })),
-    
-  deleteProduct: (id: number) =>
-    set((state) => ({
-      products: state.products.filter((product) => product.id !== id)
-    })),
-    
-  updateOrderStatus: (id: number, status: Order['status']) =>
-    set((state) => ({
-      orders: state.orders.map((order) =>
-        order.id === id ? { ...order, status } : order
-      )
-    })),
-    
-  setUser: (user: User) =>
-    set(() => ({
-      user
-    }))
-}));
+export const useStore = create<Store>()(
+  persist(
+    (set) => ({
+      // Initial state
+      products: sampleProducts,
+      orders: sampleOrders,
+      user: sampleUser,
+      
+      // Actions
+      addProduct: (product: Product) =>
+        set((state) => ({
+          products: [...state.products, product]
+        })),
+        
+      updateProduct: (updatedProduct: Product) =>
+        set((state) => ({
+          products: state.products.map((product) =>
+            product.id === updatedProduct.id ? updatedProduct : product
+          )
+        })),
+        
+      deleteProduct: (id: number) =>
+        set((state) => ({
+          products: state.products.filter((product) => product.id !== id)
+        })),
+        
+      updateProductStock: (id: number, quantity: number) => {
+        console.log(`🔄 Attempting to update stock for product ID: ${id}, reducing by: ${quantity}`);
+        set((state) => {
+          const productBefore = state.products.find(p => p.id === id);
+          console.log(`📦 Product before update:`, productBefore);
+          
+          const updatedProducts = state.products.map((product) =>
+            product.id === id 
+              ? { ...product, stock: Math.max(0, product.stock - quantity) }
+              : product
+          );
+          
+          const productAfter = updatedProducts.find(p => p.id === id);
+          console.log(`📦 Product after update:`, productAfter);
+          console.log(`✅ Stock update completed`);
+          
+          return { products: updatedProducts };
+        });
+      },
+        
+      updateOrderStatus: (id: number, status: Order['status']) =>
+        set((state) => ({
+          orders: state.orders.map((order) =>
+            order.id === id ? { ...order, status } : order
+          )
+        })),
+        
+      setUser: (user: User) =>
+        set(() => ({
+          user
+        }))
+    }),
+    {
+      name: 'ecommerce-storage', // nombre único para localStorage
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ 
+        products: state.products,
+        orders: state.orders 
+      }), // solo persistir products y orders, no user
+    }
+  )
+);

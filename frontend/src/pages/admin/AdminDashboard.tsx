@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 
 interface AdminStats {
@@ -12,6 +13,7 @@ interface AdminStats {
 
 const AdminDashboard: React.FC = () => {
   const { products, orders } = useStore();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<AdminStats>({
     totalProducts: 0,
     totalUsers: 0,
@@ -136,7 +138,7 @@ const AdminDashboard: React.FC = () => {
           subtitle="En catálogo"
           icon="📦"
           color="#3B82F6"
-          onClick={() => window.location.href = '/admin/products'}
+          onClick={() => navigate('/admin/products')}
         />
         <AdminCard
           title="Órdenes del Mes"
@@ -213,42 +215,49 @@ const AdminDashboard: React.FC = () => {
             description="Añadir nuevo producto al catálogo"
             icon="➕"
             color="#10B981"
-            onClick={() => window.location.href = '/admin/products/new'}
+            onClick={() => navigate('/admin/products')}
           />
           <QuickAction
             title="Gestionar Inventario"
             description="Ver y actualizar stock de productos"
             icon="📊"
             color="#3B82F6"
-            onClick={() => window.location.href = '/admin/inventory'}
+            onClick={() => navigate('/inventory')}
           />
           <QuickAction
             title="Procesar Órdenes"
             description="Revisar y procesar órdenes pendientes"
             icon="✅"
             color="#F59E0B"
-            onClick={() => window.location.href = '/admin/orders'}
+            onClick={() => navigate('/orders')}
           />
           <QuickAction
             title="Ver Reportes"
             description="Análisis de ventas y estadísticas"
             icon="📈"
             color="#8B5CF6"
-            onClick={() => window.location.href = '/admin/reports'}
+            onClick={() => navigate('/analytics')}
+          />
+          <QuickAction
+            title="Ver Tienda Externa"
+            description="Ir a la tienda pública donde compran los clientes"
+            icon="🌐"
+            color="#8B5CF6"
+            onClick={() => window.open('/store', '_blank')}
           />
           <QuickAction
             title="Gestionar Usuarios"
             description="Administrar cuentas de clientes"
             icon="👤"
             color="#EF4444"
-            onClick={() => window.location.href = '/admin/users'}
+            onClick={() => navigate('/customers')}
           />
           <QuickAction
             title="Configuración"
             description="Ajustes de la tienda y sistema"
             icon="⚙️"
             color="#6B7280"
-            onClick={() => window.location.href = '/admin/settings'}
+            onClick={() => navigate('/admin')}
           />
         </div>
       </div>
