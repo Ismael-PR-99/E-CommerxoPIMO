@@ -27,10 +27,10 @@ E-CommerxoPIMO/
 │   │   └── types/           # Tipos TypeScript
 │   ├── package.json
 │   └── vite.config.ts
-├── backend/                  # API Spring Boot (🚧 En desarrollo)
-├── ml-service/              # Microservicio IA Python (🚧 En desarrollo)
-├── database/                # Scripts PostgreSQL (🚧 En desarrollo)
-└── docker/                  # Contenedores Docker
+├── backend/                  # API Spring Boot (✅ EN DESARROLLO, PostgreSQL)
+├── ml-service/               # Microservicio IA Python (🚧 En desarrollo)
+├── database/                 # Scripts PostgreSQL (✅ EN USO)
+└── docker/                   # Contenedores Docker
 ```
 
 ---
@@ -118,23 +118,16 @@ npm run dev -- --debug
 
 ## 🗄️ Base de Datos - Estado Actual
 
-### 💾 **SIN INSTALACIÓN REQUERIDA**
-El proyecto actualmente usa **Zustand + localStorage**:
-- ✅ **No necesitas instalar MySQL, PostgreSQL, MongoDB**
-- ✅ **No necesitas configurar base de datos**
-- ✅ **Los datos se guardan automáticamente en el navegador**
-- ✅ **Funciona inmediatamente después de `npm run dev`**
+El backend usará **PostgreSQL** como base de datos principal:
+- ✅ Scripts y migraciones en `database/postgresql/`
+- ✅ Integración con Spring Boot y JPA/Hibernate
+- ✅ Docker para levantar la base de datos fácilmente
 
-### 📊 Datos Incluidos
-El sistema viene con productos de ejemplo:
-```javascript
-// Productos precargados:
-- Laptop Dell XPS 13 (Stock: 15, Precio: $1,299.99)
-- iPhone 14 Pro (Stock: 8, Precio: $999.99)
-- Monitor Samsung 27" (Stock: 22, Precio: $399.99)
-- MacBook Pro M3 (Stock: 5, Precio: $2,499.99)
-- Auriculares Sony (Stock: 30, Precio: $199.99)
-- Teclado Mecánico (Stock: 12, Precio: $89.99)
+### 📋 Instalación rápida de PostgreSQL con Docker
+
+```bash
+# Desde el directorio docker/
+docker-compose up -d
 ```
 
 ---
@@ -357,41 +350,12 @@ frontend/src/
 
 ## 🔄 Estado del Proyecto (Julio 2025)
 
-| Componente | Estado | Funcionalidad |
-|------------|--------|---------------|
-| 🖼️ **Frontend React** | ✅ **COMPLETO** | Tienda + Admin funcionando al 100% |
-| 💾 **Estado/Persistencia** | ✅ **COMPLETO** | Zustand + localStorage |
-| 🛒 **Carrito de Compras** | ✅ **COMPLETO** | Funcional con validaciones |
-| 📦 **Control de Stock** | ✅ **COMPLETO** | Tiempo real + persistencia |
-| 🎨 **UI/UX** | ✅ **COMPLETO** | Tema moderno blanco/negro |
-| 🌐 **Backend Spring Boot** | 🚧 **EN DESARROLLO** | API REST (futuro) |
-| 🤖 **IA Python** | 🚧 **EN DESARROLLO** | Recomendaciones (futuro) |
-| 🗄️ **Base de Datos Real** | 📋 **PLANIFICADO** | PostgreSQL (futuro) |
-| 🔐 **Autenticación** | 📋 **PLANIFICADO** | JWT (futuro) |
-| 💳 **Pagos Reales** | 📋 **PLANIFICADO** | Stripe/PayPal (futuro) |
-
----
-
-## 🎯 Próximos Pasos de Desarrollo
-
-### ⚡ **Inmediato (Semana 1-2)**
-- [ ] Integrar backend Spring Boot
-- [ ] Conectar base de datos PostgreSQL
-- [ ] Migrar de localStorage a API
-
-### 🚀 **Corto Plazo (Mes 1)**
-- [ ] Sistema de autenticación JWT
-- [ ] API REST completa
-- [ ] Deploy en servidor
-
-### 🌟 **Largo Plazo (Mes 2-3)**
-- [ ] Microservicio de IA
-- [ ] Sistema de pagos real
-- [ ] Dashboard de analíticas avanzado
-- [ ] App móvil
-
----
-
-**🎉 ¡Felicidades! Ya tienes un sistema de e-commerce completamente funcional.**
-
-*Última actualización: Julio 14, 2025 - Sistema Frontend 100% operativo*
+| Componente            | Estado         | Funcionalidad                       |
+|-----------------------|---------------|-------------------------------------|
+| 🖼️ Frontend React     | ✅ COMPLETO    | Tienda + Admin funcionando al 100%  |
+| 💾 Persistencia       | ✅ COMPLETO    | Zustand + localStorage              |
+| 🛒 Carrito de Compras | ✅ COMPLETO    | Funcional con validaciones          |
+| 📦 Control de Stock   | ✅ COMPLETO    | Tiempo real + persistencia          |
+| 🌐 Backend Spring Boot| 🚧 EN DESARROLLO| API REST + PostgreSQL (en progreso) |
+| 🗄️ Base de Datos Real | ✅ EN USO      | PostgreSQL + migraciones            |
+```
