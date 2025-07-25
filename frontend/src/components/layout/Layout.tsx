@@ -22,9 +22,7 @@ const Layout: React.FC = () => {
           <Header />
           <main style={{
             flex: 1,
-            overflowY: 'auto',
-            padding: '24px',
-            maxHeight: 'calc(100vh - 80px)'
+            padding: '24px'
           }}>
             <div className="glass-card" style={{
               padding: '32px',
