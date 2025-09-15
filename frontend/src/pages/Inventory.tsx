@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../store/useStore.ts';
 import type { Product } from '../types';
+import { fmtCurrency } from '../utils/format';
 
 const Inventory = () => {
   const { products } = useStore();
@@ -145,7 +146,7 @@ const Inventory = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${product.price.toFixed(2)}
+                      {fmtCurrency(product.price)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button className="text-blue-600 hover:text-blue-900 mr-3">

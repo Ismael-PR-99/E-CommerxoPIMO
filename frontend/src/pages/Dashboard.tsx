@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
+import { fmtCurrency, fmtDate } from '../utils/format';
 
 const Dashboard: React.FC = () => {
   const { products, orders } = useStore();
@@ -88,7 +89,7 @@ const Dashboard: React.FC = () => {
         />
 
         <StatCard
-          value={`$${stats.totalValue.toLocaleString()}`}
+          value={fmtCurrency(stats.totalValue)}
           subtitle="Inventario"
           colorClass="text-blue-600"
           icon="💰"
@@ -129,7 +130,7 @@ const Dashboard: React.FC = () => {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 text-right tabular-nums text-sm text-gray-900">
-                      ${order.total.toLocaleString()}
+                      {fmtCurrency(order.total)}
                     </td>
                   </tr>
                 ))}

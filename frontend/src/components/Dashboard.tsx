@@ -10,24 +10,8 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 import { DashboardMetrics } from '../types';
-
-interface MetricCardProps {
-    title: string;
-    value: string | number;
-    icon: React.ReactNode;
-}
-
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, icon }) => (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex items-center justify-between">
-            <div>
-                <p className="text-sm text-gray-500">{title}</p>
-                <p className="text-2xl font-semibold mt-2">{value}</p>
-            </div>
-            <div className="text-blue-500">{icon}</div>
-        </div>
-    </div>
-);
+import { fmtCurrency, fmtNumber } from '../utils/format';
+import { MetricCard } from './ui/Card';
 
 interface DashboardProps {
     metrics: DashboardMetrics;
@@ -36,32 +20,32 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ metrics }) => {
     return (
         <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+            <h1 className="text-2xl font-bold mb-6">Panel de Control</h1>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <MetricCard
                     title="Total Productos"
-                    value={metrics.totalProducts}
+                    value={fmtNumber(metrics.totalProducts)}
                     icon={<span>📦</span>}
                 />
                 <MetricCard
-                    title="Productos Bajo Stock"
-                    value={metrics.lowStockProducts}
+                    title="Productos con Stock Bajo"
+                    value={fmtNumber(metrics.lowStockProducts)}
                     icon={<span>⚠️</span>}
                 />
                 <MetricCard
-                    title="Total Órdenes"
-                    value={metrics.totalOrders}
+                    title="Total de Pedidos"
+                    value={fmtNumber(metrics.totalOrders)}
                     icon={<span>🛍️</span>}
                 />
                 <MetricCard
                     title="Ingresos Totales"
-                    value={`$${metrics.totalRevenue.toLocaleString()}`}
+                    value={fmtCurrency(metrics.totalRevenue)}
                     icon={<span>💰</span>}
                 />
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white p-6 rounded-card shadow-card">
                 <h2 className="text-xl font-semibold mb-4">Estadísticas Mensuales</h2>
                 <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
@@ -80,7 +64,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ metrics }) => {
                                 type="monotone"
                                 dataKey="orders"
                                 stroke="#8884d8"
-                                name="Órdenes"
+                                name="Pedidos"
                             />
                             <Line
                                 yAxisId="right"

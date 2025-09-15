@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../store/useStore';
+import { fmtCurrency } from '../../utils/format';
 
 const CleanProductManagement: React.FC = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useStore();
@@ -160,7 +161,7 @@ const CleanProductManagement: React.FC = () => {
             border: '1px solid #808080'
           }}>
             <div style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '0.5rem' }}>
-              ${products.reduce((sum, p) => sum + (p.price * p.stock), 0).toLocaleString()}
+              {fmtCurrency(products.reduce((sum, p) => sum + (p.price * p.stock), 0))}
             </div>
             <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>
               💰 Valor Total

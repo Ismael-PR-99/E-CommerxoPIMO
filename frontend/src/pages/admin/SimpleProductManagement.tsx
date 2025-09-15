@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../store/useStore';
+import { fmtCurrency } from '../../utils/format';
 
 const SimpleProductManagement: React.FC = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useStore();
@@ -121,7 +122,7 @@ const SimpleProductManagement: React.FC = () => {
         </div>
         <div className="glass-card" style={{ padding: '20px', textAlign: 'center' }}>
           <h3 style={{ margin: '0 0 4px 0', fontSize: '28px', color: '#10B981' }}>
-            ${products.reduce((sum, p) => sum + (p.price * p.stock), 0).toLocaleString()}
+            {fmtCurrency(products.reduce((sum, p) => sum + (p.price * p.stock), 0))}
           </h3>
           <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>Valor Inventario</p>
         </div>

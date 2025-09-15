@@ -1,8 +1,9 @@
 import { Card } from "../components/ui/Card"
+import { fmtCurrency } from '../utils/format';
 
 export default function AnalyticsPage() {
   const metrics = [
-    { title: "Ventas Totales", value: "$45,231.89", change: "+20.1%", period: "vs mes anterior" },
+    { title: "Ventas Totales", value: fmtCurrency(45231.89), change: "+20.1%", period: "vs mes anterior" },
     { title: "Pedidos", value: "2,350", change: "+180.1%", period: "vs mes anterior" },
     { title: "Productos Vendidos", value: "12,234", change: "+19%", period: "vs mes anterior" },
     { title: "Conversión", value: "3.24%", change: "+4.3%", period: "vs mes anterior" }
@@ -63,7 +64,7 @@ export default function AnalyticsPage() {
                       style={{ width: `${(data.sales / 6000) * 100}%` }}
                     ></div>
                   </div>
-                  <span className="text-sm text-gray-600">${data.sales.toLocaleString()}</span>
+                  <span className="text-sm text-gray-600">{fmtCurrency(data.sales)}</span>
                 </div>
               </div>
             ))}

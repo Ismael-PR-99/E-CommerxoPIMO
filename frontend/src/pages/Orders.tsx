@@ -6,6 +6,7 @@ import type { Order } from '../types';
 import { useStore } from '../store/useStore.ts';
 import { useDebounce } from '../hooks/useDebounce.ts';
 import { usePagination } from '../hooks/usePagination.ts';
+import { fmtCurrency, fmtDate } from '../utils/format';
 
 // Memoized OrderRow component
 const OrderRow = memo(({ order, onViewDetails, onUpdateStatus }: {
@@ -35,7 +36,7 @@ const OrderRow = memo(({ order, onViewDetails, onUpdateStatus }: {
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${order.total.toFixed(2)}
+        {fmtCurrency(order.total)}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <Badge className={getStatusColor(order.status)}>
@@ -43,7 +44,7 @@ const OrderRow = memo(({ order, onViewDetails, onUpdateStatus }: {
         </Badge>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        {new Date(order.date).toLocaleDateString()}
+        {fmtDate(new Date(order.date))}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
         {order.items.length} item{order.items.length !== 1 ? 's' : ''}

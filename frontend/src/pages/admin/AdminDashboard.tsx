@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import { Card } from '../../components/ui/Card';
+import { fmtCurrency, fmtNumber } from '../../utils/format';
 
 interface AdminStats {
   totalProducts: number;
@@ -59,7 +60,7 @@ const AdminDashboard: React.FC = () => {
           <div>
             <p className="text-sm text-gray-600 mb-2">{title}</p>
             <h3 className="text-3xl font-bold text-gray-900 mb-1 tabular-nums">
-              {typeof value === 'number' ? value.toLocaleString() : value}
+              {typeof value === 'number' ? fmtNumber(value) : value}
             </h3>
             <p className="text-xs text-gray-500">{subtitle}</p>
           </div>
@@ -135,7 +136,7 @@ const AdminDashboard: React.FC = () => {
         />
         <AdminCard
           title="Ingresos Mensuales"
-          value={`$${stats.monthlyRevenue.toLocaleString()}`}
+          value={fmtCurrency(stats.monthlyRevenue)}
           subtitle="Órdenes completadas"
           icon="💰"
           color="#F59E0B"

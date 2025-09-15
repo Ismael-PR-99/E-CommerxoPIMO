@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
+import { fmtCurrency } from '../utils/format';
 
 interface CartItem {
   id: number;
@@ -106,7 +107,7 @@ const Store: React.FC = () => {
     });
     
     // Aquí normalmente harías la integración con un sistema de pago
-    alert(`¡Gracias por tu compra! Total: $${getCartTotal().toFixed(2)}\n\nEl stock ha sido actualizado automáticamente.`);
+    alert(`¡Gracias por tu compra! Total: ${fmtCurrency(getCartTotal())}\n\nEl stock ha sido actualizado automáticamente.`);
     setCart([]);
     setShowCart(false);
   };
@@ -316,7 +317,7 @@ const Store: React.FC = () => {
                     fontWeight: 'bold',
                     color: '#1f2937'
                   }}>
-                    ${product.price.toFixed(2)}
+                    {fmtCurrency(product.price)}
                   </div>
                   <div style={{
                     fontSize: '0.8rem',
@@ -453,7 +454,7 @@ const Store: React.FC = () => {
                           {item.name}
                         </h4>
                         <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>
-                          ${item.price.toFixed(2)} c/u
+                          {fmtCurrency(item.price)} c/u
                         </p>
                       </div>
 
@@ -533,7 +534,7 @@ const Store: React.FC = () => {
                     marginBottom: '1rem'
                   }}>
                     <span>Total:</span>
-                    <span>${getCartTotal().toFixed(2)}</span>
+                    <span>{fmtCurrency(getCartTotal())}</span>
                   </div>
 
                   <button
