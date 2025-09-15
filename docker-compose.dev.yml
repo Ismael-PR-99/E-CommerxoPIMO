@@ -1,0 +1,86 @@
+# Docker Compose Override para DESARROLLO
+# Usar con: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+version: '3.8'
+
+services:
+  # ===== POSTGRES - CONFIGURACIÓN DESARROLLO =====
+  postgres:
+    environment:
+      # Configuración más permisiva para desarrollo
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C --auth-trust"
+    # Exponemos puerto para acceso directo desde host
+    ports:
+      - "5432:5432"
+    # Volumen local para desarrollo rápido
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+
+  # ===== REDIS - CONFIGURACIÓN DESARROLLO =====
+  redis:
+    # Puerto expuesto para herramientas de desarrollo
+    ports:
+      - "6379:6379"
+    # Configuración más relajada para dev
+    command: >
+      redis-server 
+      --appendonly no
+      --save ""
+      --maxmemory 128mb
+
+  # ===== ML SERVICE - DESARROLLO =====
+  ml-service:
+    # Hot reload y debug
+    environment:
+      FASTAPI_ENV: development
+      PYTHONPATH: /app
+      LOG_LEVEL: debug
+      RELOAD: "true"
+    # Volumen para desarrollo (hot reload)
+    volumes:
+      - ./ml-service/app:/app/app:ro
+    # Comando con reload automático
+    command: >
+      uvicorn app.main:app 
+      --host 0.0.0.0 
+      --port 8001 
+      --reload 
+      --log-level debug
+
+  # ===== ECOMMERCE API - DESARROLLO =====
+  ecommerce-api:
+    environment:
+      # Perfil de desarrollo
+      SPRING_PROFILES_ACTIVE: docker,dev
+      # Mostrar SQL para debug
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      # DDL automático para desarrollo
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # Logging de desarrollo
+      LOGGING_LEVEL_COM_ECOMMERCEPIMO: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: DEBUG
+      # JWT más corto para testing
+      JWT_ACCESS_TOKEN_EXPIRATION: 300000  # 5 minutos
+    # Volumen para hot reload de configuración
+    volumes:
+      - ./backend/src/main/resources:/app/config:ro
+
+  # ===== FRONTEND DESARROLLO =====
+  frontend-dev:
+    # Vite dev server con hot reload
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./frontend/src:/app/src:ro
+      - ./frontend/public:/app/public:ro
+    environment:
+      # URLs de desarrollo
+      VITE_API_URL: http://localhost:8080/api
+      VITE_ML_SERVICE_URL: http://localhost:8001
+      # Hot Module Replacement
+      VITE_HMR_PORT: 3000
+
+# ===== CONFIGURACIÓN DESARROLLO =====
+networks:
+  ecommerce-network:
+    # Network bridge para desarrollo local
+    driver: bridge

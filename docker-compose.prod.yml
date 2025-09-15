@@ -1,0 +1,156 @@
+# Docker Compose Override para PRODUCCIÓN
+# Usar con: docker compose -f docker-compose.yml -f docker-compose.prod.yml up
+version: '3.8'
+
+services:
+  # ===== POSTGRES - CONFIGURACIÓN PRODUCCIÓN =====
+  postgres:
+    # NO exponer puerto en producción (solo red interna)
+    ports: []
+    environment:
+      # Configuración segura para producción
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    # Límites de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    # Configuración optimizada
+    command: >
+      postgres
+      -c max_connections=100
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+
+  # ===== REDIS - CONFIGURACIÓN PRODUCCIÓN =====
+  redis:
+    # NO exponer puerto en producción
+    ports: []
+    # Configuración optimizada para producción
+    command: >
+      redis-server 
+      --appendonly yes 
+      --appendfsync everysec
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 60
+      --timeout 300
+    # Límites de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+
+  # ===== ML SERVICE - PRODUCCIÓN =====
+  ml-service:
+    # NO debug en producción
+    environment:
+      FASTAPI_ENV: production
+      LOG_LEVEL: info
+      WORKERS: 2
+    # Límites de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+      replicas: 1
+    # Comando optimizado para producción
+    command: >
+      uvicorn app.main:app 
+      --host 0.0.0.0 
+      --port 8001 
+      --workers 2
+      --worker-class uvicorn.workers.UvicornWorker
+      --access-log
+      --no-use-colors
+
+  # ===== ECOMMERCE API - PRODUCCIÓN =====
+  ecommerce-api:
+    environment:
+      # Perfil de producción
+      SPRING_PROFILES_ACTIVE: docker,prod
+      # NO mostrar SQL en producción
+      SPRING_JPA_SHOW_SQL: "false"
+      # DDL solo validación en producción
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      # Logging de producción
+      LOGGING_LEVEL_COM_ECOMMERCEPIMO: INFO
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: WARN
+      # JWT más largo para producción
+      JWT_ACCESS_TOKEN_EXPIRATION: 3600000  # 60 minutos
+      # Optimizaciones JVM
+      JAVA_OPTS: >
+        -Xmx1g -Xms512m
+        -XX:+UseG1GC
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/tmp
+    # Límites de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # ===== FRONTEND PRODUCCIÓN (NGINX) =====
+  frontend-prod:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: ${BACKEND_URL:-https://api.yourdomain.com}/api
+    container_name: ecommerce-frontend-prod
+    profiles: ["prod"]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # SSL certificates
+      - ./ssl:/etc/nginx/ssl:ro
+      # Nginx configuración
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      ecommerce-api:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+    # Límites de recursos
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+# ===== CONFIGURACIÓN PRODUCCIÓN =====
+networks:
+  ecommerce-network:
+    # Red overlay para producción distribuida
+    driver: overlay
+    attachable: true
+    
+# ===== CONFIGURACIÓN DOCKER SWARM (OPCIONAL) =====
+# Para deploy en cluster, descomentar:
+# deploy:
+#   replicas: 2
+#   update_config:
+#     parallelism: 1
+#     delay: 10s
+#   restart_policy:
+#     condition: on-failure

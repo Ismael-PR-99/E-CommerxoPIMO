@@ -1,15 +1,21 @@
-# 🛒 E-CommerxoPIMO - Sistema de Gestión de Inventario E-commerce
+# 🛒 E-CommerxoPIMO - Sistema E-commerce con ML
+
+[![Backend CI](https://github.com/Ismael-PR-99/E-CommerxoPIMO/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/Ismael-PR-99/E-CommerxoPIMO/actions/workflows/backend-ci.yml)
+[![ML Service CI](https://github.com/Ismael-PR-99/E-CommerxoPIMO/actions/workflows/ml-service-ci.yml/badge.svg)](https://github.com/Ismael-PR-99/E-CommerxoPIMO/actions/workflows/ml-service-ci.yml)
+[![codecov](https://codecov.io/gh/Ismael-PR-99/E-CommerxoPIMO/branch/main/graph/badge.svg)](https://codecov.io/gh/Ismael-PR-99/E-CommerxoPIMO)
 
 ## 📋 Descripción del Proyecto
 
-**E-CommerxoPIMO** es un sistema completo de gestión de inventario para e-commerce que incluye:
-- 🏪 **Tienda externa** para clientes
-- ⚙️ **Panel de administración** para gestionar productos
-- 📦 **Control de stock en tiempo real**
-- 🛒 **Sistema de carrito de compras**
-- 💾 **Persistencia de datos con localStorage**
-- 🤖 **Microservicio de IA** (en desarrollo)
-- 🗄️ **Backend con Spring Boot** (en desarrollo)
+**E-CommerxoPIMO** es un sistema completo de e-commerce empresarial con capacidades de Machine Learning que incluye:
+
+- 🏪 **Tienda frontend** React + TypeScript + Tailwind CSS
+- ⚙️ **Panel de administración** con analytics y gestión completa  
+- 🚀 **Backend API REST** Spring Boot + PostgreSQL
+- 🤖 **Microservicio ML** FastAPI con predicciones y recomendaciones
+- � **Sistema de cache** Redis para optimización
+- � **Containerización** Docker + Docker Compose
+- 📈 **Monitoring** Prometheus + Grafana
+- � **CI/CD** GitHub Actions + Pre-commit hooks
 
 ---
 
@@ -17,52 +23,410 @@
 
 ```
 E-CommerxoPIMO/
-├── frontend/                 # Aplicación React (✅ FUNCIONAL)
+├── frontend/                 # React + TypeScript + Tailwind
 │   ├── src/
 │   │   ├── components/       # Componentes reutilizables
-│   │   ├── pages/           # Páginas principales
-│   │   │   ├── admin/       # Panel de administración
-│   │   │   └── Store.tsx    # Tienda externa
+│   │   ├── pages/           # Páginas y rutas
 │   │   ├── store/           # Estado global (Zustand)
-│   │   └── types/           # Tipos TypeScript
-│   ├── package.json
-│   └── vite.config.ts
-├── backend/                  # API Spring Boot (✅ EN DESARROLLO, PostgreSQL)
-├── ml-service/               # Microservicio IA Python (🚧 En desarrollo)
-├── database/                 # Scripts PostgreSQL (✅ EN USO)
-└── docker/                   # Contenedores Docker
+│   │   └── services/        # APIs y servicios
+│   └── package.json
+├── backend/                  # Spring Boot + PostgreSQL
+│   ├── src/main/java/       # Código fuente Java
+│   ├── src/test/            # Tests unitarios e integración
+│   └── pom.xml              # Dependencias Maven
+├── ml-service/               # FastAPI + Scikit-learn + Redis
+│   ├── app/                 # Código fuente Python
+│   │   ├── api/             # Endpoints REST
+│   │   ├── models/          # Modelos ML
+│   │   └── db/              # Conexión base de datos
+│   ├── tests/               # Tests pytest
+│   └── requirements.txt
+├── database/                 # Scripts SQL PostgreSQL
+├── docker/                   # Configuración Docker
+├── .github/workflows/        # CI/CD GitHub Actions
+└── .pre-commit-config.yaml   # Hooks de calidad
 ```
 
 ---
 
-## 🚀 Instalación y Configuración RÁPIDA
+## 🚀 Inicio Rápido
 
-### 📋 Prerrequisitos MÍNIMOS
+### 📋 Prerrequisitos
 
-1. **Node.js** (versión 18 o superior)
-   ```bash
-   # Verificar instalación
-   node --version
-   npm --version
-   ```
+- **Node.js** 18+ & **npm**
+- **Java** 17+ & **Maven** 3.8+
+- **Python** 3.11+ & **pip**
+- **Docker** & **Docker Compose**
+- **Git**
 
-2. **Git** (para clonar el repositorio)
-
-### ⚡ INICIO RÁPIDO (5 minutos)
+### ⚡ Setup Automático
 
 ```bash
 # 1. Clonar repositorio
 git clone https://github.com/Ismael-PR-99/E-CommerxoPIMO.git
 cd E-CommerxoPIMO
 
-# 2. Instalar y ejecutar
-cd frontend
-npm install
-npm run dev
+# 2. Setup completo de desarrollo (incluye BD, deps, migraciones)
+make dev-setup
 
-# 3. Abrir en navegador:
-# Tienda: http://localhost:5173/store
-# Admin: http://localhost:5173/admin/products
+# 3. Ejecutar servicios en desarrollo
+make dev-run
+```
+
+### 🌐 URLs de Servicios
+
+| Servicio | URL | Descripción |
+|----------|-----|-------------|
+| Frontend | http://localhost:3000 | Aplicación React |
+| Backend API | http://localhost:8080 | API REST Spring Boot |
+| ML Service | http://localhost:8001 | Microservicio ML |
+| Admin Panel | http://localhost:3000/admin | Panel administrativo |
+| API Docs | http://localhost:8001/docs | Documentación FastAPI |
+| Prometheus | http://localhost:9090 | Métricas |
+| Grafana | http://localhost:3001 | Dashboards |
+
+---
+
+## �️ Desarrollo
+
+### 🎨 Formateo y Linting
+
+```bash
+# Formatear todo el código
+make format
+
+# Ejecutar linting
+make lint
+
+# Instalar pre-commit hooks
+make install-dev
+```
+
+### 🧪 Testing
+
+```bash
+# Tests unitarios
+make test
+
+# Tests con coverage
+make test-cov
+
+# Tests de integración  
+make test-integration
+
+# Tests de performance
+make performance
+```
+
+### 🔒 Análisis de Seguridad
+
+```bash
+# Análisis de vulnerabilidades
+make security
+
+# OWASP dependency check (Java)
+cd backend && mvn org.owasp:dependency-check-maven:check
+
+# Bandit + Safety (Python)
+cd ml-service && bandit -r app && safety check
+```
+
+---
+
+## 🌍 Variables de Entorno
+
+### Backend (.env)
+```bash
+# Base de datos
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=ecommerce
+DB_USERNAME=postgres
+DB_PASSWORD=password
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# JWT
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRATION=86400
+
+# ML Service
+ML_SERVICE_URL=http://localhost:8001
+```
+
+### ML Service (.env)
+```bash
+# Base de datos
+DATABASE_URL=postgresql://postgres:password@localhost:5432/ecommerce
+
+# Redis
+REDIS_URL=redis://localhost:6379/0
+
+# ML Configuración
+MODEL_CACHE_TTL=3600
+PREDICTION_CACHE_TTL=1800
+RECOMMENDATION_CACHE_TTL=900
+
+# API Keys (opcional)
+OPENAI_API_KEY=your_openai_key
+```
+
+### Frontend (.env)
+```bash
+# API URLs
+VITE_API_URL=http://localhost:8080/api
+VITE_ML_API_URL=http://localhost:8001/api/v1
+
+# Environment
+VITE_ENVIRONMENT=development
+```
+
+---
+
+## 📚 Documentación Técnica
+
+### 🔄 Pipeline CI/CD
+
+#### GitHub Actions
+- **Backend CI**: Maven build, tests, Spotless format check, security scan
+- **ML Service CI**: pytest, black/isort format, mypy type check, safety scan
+- **Triggers**: Push/PR a main/develop en rutas específicas
+- **Artifacts**: Test reports, coverage, security reports
+
+#### Pre-commit Hooks
+```bash
+# Instalar hooks
+pre-commit install
+
+# Ejecutar manualmente
+pre-commit run --all-files
+
+# Hooks configurados:
+# - trailing-whitespace, end-of-file-fixer
+# - Python: black, isort, flake8, mypy, bandit
+# - Java: Spotless format check
+# - Docker: hadolint
+# - Secrets: detect-secrets
+```
+
+### 🧪 Testing Strategy
+
+#### Backend (Java)
+```bash
+# Tests unitarios
+mvn test
+
+# Tests de integración
+mvn failsafe:integration-test
+
+# Coverage report
+mvn jacoco:report
+
+# Ubicación: target/site/jacoco/index.html
+```
+
+#### ML Service (Python)
+```bash
+# Tests con pytest
+pytest -v
+
+# Coverage
+pytest --cov=app --cov-report=html
+
+# Tests por categoría
+pytest -m unit        # Solo unitarios
+pytest -m integration # Solo integración
+pytest -m ml          # Solo ML
+```
+
+### 📊 Monitoring y Observabilidad
+
+#### Métricas Disponibles
+- **Application metrics**: Spring Boot Actuator + FastAPI metrics
+- **Infrastructure metrics**: Prometheus + Node Exporter
+- **Custom metrics**: ML model performance, prediction accuracy
+- **Dashboards**: Grafana con alertas configuradas
+
+#### Logs Centralizados
+```bash
+# Ver logs en desarrollo
+make docker-logs
+
+# Logs estructurados con nivel configurable
+# Backend: Logback (JSON format)
+# ML Service: Python logging (structured)
+```
+
+---
+
+## 🚀 Despliegue
+
+### 🐳 Docker Production
+
+```bash
+# Build y deploy completo
+docker-compose -f docker/docker-compose.yml up -d
+
+# Solo servicios core
+docker-compose -f docker/docker-compose.yml up -d postgres redis backend ml-service
+
+# Con monitoring
+docker-compose -f docker/docker-compose.optimized.yml up -d
+```
+
+### ⚙️ Variables de Producción
+
+#### Obligatorias
+```bash
+# Security
+JWT_SECRET=<strong-random-secret>
+DB_PASSWORD=<secure-database-password>
+
+# External services
+REDIS_PASSWORD=<redis-password>
+SMTP_PASSWORD=<email-service-password>
+
+# ML Service
+MODEL_API_KEY=<external-ml-api-key>
+```
+
+#### Opcionales
+```bash
+# Monitoring
+PROMETHEUS_RETENTION=30d
+GRAFANA_ADMIN_PASSWORD=<grafana-password>
+
+# Performance
+DB_POOL_SIZE=20
+REDIS_POOL_SIZE=10
+ML_WORKER_THREADS=4
+```
+
+---
+
+## 🛠️ Comandos de Desarrollo
+
+### 📋 Makefile Completo
+
+```bash
+# Setup inicial
+make dev-setup          # Configuración completa de desarrollo
+make install-dev         # Solo dependencias e hooks
+
+# Desarrollo diario
+make format             # Formatear código (Python + Java)
+make lint               # Linting completo
+make test               # Tests rápidos
+make test-cov           # Tests con coverage
+
+# CI/CD local
+make ci-backend         # Pipeline backend completo
+make ci-ml              # Pipeline ML service completo
+make ci-full            # Pipeline completo + security
+
+# Docker
+make docker-build       # Construir imágenes
+make docker-run         # Ejecutar stack completo
+make docker-stop        # Parar servicios
+make docker-logs        # Ver logs
+
+# Utilidades
+make clean              # Limpiar archivos temporales
+make security           # Análisis de seguridad
+make performance        # Tests de performance
+make monitor            # Iniciar stack de monitoring
+```
+
+---
+
+## 🤝 Contribución
+
+### 📝 Convenciones
+
+#### Commits (Conventional Commits)
+```bash
+feat: nueva funcionalidad
+fix: corrección de bug
+docs: actualización documentación
+style: cambios de formato
+refactor: refactorización sin cambios funcionales
+test: agregar o modificar tests
+chore: tareas de mantenimiento
+```
+
+#### Branches
+```bash
+main        # Producción
+develop     # Desarrollo
+feature/*   # Nuevas funcionalidades
+hotfix/*    # Correcciones urgentes
+release/*   # Preparación de releases
+```
+
+#### Pull Requests
+1. **Pre-requisitos**: Todos los checks CI deben pasar
+2. **Review**: Al menos 1 aprobación requerida
+3. **Tests**: Coverage mínimo 80%
+4. **Format**: Pre-commit hooks deben pasar
+
+### 🔧 Setup de Contribuidor
+
+```bash
+# 1. Fork del repositorio
+# 2. Clonar tu fork
+git clone https://github.com/TU-USUARIO/E-CommerxoPIMO.git
+
+# 3. Setup de desarrollo
+make dev-setup
+
+# 4. Crear rama de feature
+git checkout -b feature/nueva-funcionalidad
+
+# 5. Desarrollar con commits convencionales
+git commit -m "feat: agregar endpoint de recomendaciones ML"
+
+# 6. Push y crear PR
+git push origin feature/nueva-funcionalidad
+```
+
+---
+
+## 📞 Soporte y Contacto
+
+### 🐛 Reportar Issues
+- **Bugs**: Usar template de bug report
+- **Features**: Usar template de feature request
+- **Security**: Enviar email privado a security@ecommercepimo.com
+
+### 📖 Recursos Adicionales
+- [Documentación API](http://localhost:8080/swagger-ui.html)
+- [ML API Docs](http://localhost:8001/docs)
+- [Wiki del Proyecto](https://github.com/Ismael-PR-99/E-CommerxoPIMO/wiki)
+- [Roadmap](https://github.com/Ismael-PR-99/E-CommerxoPIMO/projects/1)
+
+### 👥 Equipo de Desarrollo
+- **Maintainer**: [@Ismael-PR-99](https://github.com/Ismael-PR-99)
+- **Contributors**: Ver [CONTRIBUTORS.md](CONTRIBUTORS.md)
+
+---
+
+## 📄 Licencia
+
+Este proyecto está licenciado bajo la [MIT License](LICENSE).
+
+---
+
+<div align="center">
+
+**⭐ Si este proyecto te resultó útil, ¡considera darle una estrella! ⭐**
+
+[🐛 Reportar Bug](https://github.com/Ismael-PR-99/E-CommerxoPIMO/issues/new?template=bug_report.md) • 
+[💡 Solicitar Feature](https://github.com/Ismael-PR-99/E-CommerxoPIMO/issues/new?template=feature_request.md) • 
+[📖 Documentación](https://github.com/Ismael-PR-99/E-CommerxoPIMO/wiki)
+
+</div>
 ```
 
 **¡LISTO! El sistema está funcionando.**

@@ -1,7 +1,47 @@
 package com.ecommercepimo.ecommerce.service;
 
 import com.ecommercepimo.ecommerce.dto.*;
-import com.ecommercepimo.ecommerce.entity.User;
+import com.ecommercepimo.ecommerc    }
+
+    /**
+     * Renovar tokens usando refresh token
+     */
+    public AuthResponse refreshToken(String refreshToken) {
+        log.info("Refreshing token");
+
+        try {
+            // Validar refresh token
+            if (!jwtUtil.validateRefreshToken(refreshToken)) {
+                throw new IllegalArgumentException("Refresh token invÃ¡lido o expirado");
+            }
+
+            // Extraer username del refresh token
+            String username = jwtUtil.extractUsername(refreshToken);
+            
+            // Buscar usuario
+            User user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+            // Generar nuevo par de tokens
+            JwtUtil.TokenPair tokenPair = jwtUtil.generateTokenPair(user);
+
+            log.info("Tokens refreshed successfully for user: {}", username);
+
+            return AuthResponse.builder()
+                    .accessToken(tokenPair.getAccessToken())
+                    .refreshToken(tokenPair.getRefreshToken())
+                    .expiresIn(tokenPair.getAccessTokenExpiresIn())
+                    .user(userMapper.toUserResponse(user))
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Token refresh failed: {}", e.getMessage());
+            throw new IllegalArgumentException("Error renovando tokens: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Cambiar contraseÃ±a del usuariotity.User;
 import com.ecommercepimo.ecommerce.mapper.UserMapper;
 import com.ecommercepimo.ecommerce.repository.UserRepository;
 import com.ecommercepimo.ecommerce.security.JwtUtil;
@@ -36,7 +76,7 @@ public class AuthService {
 
         // Verificar si el email ya existe
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email ya está registrado: " + request.getEmail());
+            throw new RuntimeException("Email ya estï¿½ registrado: " + request.getEmail());
         }
 
         // Crear nuevo usuario
@@ -48,11 +88,13 @@ public class AuthService {
         User savedUser = userRepository.save(user);
         log.info("User registered successfully with ID: {}", savedUser.getId());
 
-        // Generar token JWT
-        String token = jwtUtil.generateToken(savedUser);
+        // Generar par de tokens JWT
+        JwtUtil.TokenPair tokenPair = jwtUtil.generateTokenPair(savedUser);
 
         return AuthResponse.builder()
-                .token(token)
+                .accessToken(tokenPair.getAccessToken())
+                .refreshToken(tokenPair.getRefreshToken())
+                .expiresIn(tokenPair.getAccessTokenExpiresIn())
                 .user(userMapper.toUserResponse(savedUser))
                 .build();
     }
@@ -75,19 +117,21 @@ public class AuthService {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             User user = (User) userDetails;
 
-            // Generar token JWT
-            String token = jwtUtil.generateToken(userDetails);
+            // Generar par de tokens JWT
+            JwtUtil.TokenPair tokenPair = jwtUtil.generateTokenPair(userDetails);
 
             log.info("User authenticated successfully: {}", request.getEmail());
 
             return AuthResponse.builder()
-                    .token(token)
+                    .accessToken(tokenPair.getAccessToken())
+                    .refreshToken(tokenPair.getRefreshToken())
+                    .expiresIn(tokenPair.getAccessTokenExpiresIn())
                     .user(userMapper.toUserResponse(user))
                     .build();
 
         } catch (BadCredentialsException e) {
             log.error("Authentication failed for user: {}", request.getEmail());
-            throw new RuntimeException("Credenciales inválidas");
+            throw new RuntimeException("Credenciales invï¿½lidas");
         }
     }
 
@@ -121,7 +165,7 @@ public class AuthService {
     }
 
     /**
-     * Cambiar contraseña del usuario
+     * Cambiar contraseï¿½a del usuario
      */
     public void changePassword(String email, String currentPassword, String newPassword) {
         log.info("Changing password for user: {}", email);
@@ -129,12 +173,12 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Verificar contraseña actual
+        // Verificar contraseï¿½a actual
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new RuntimeException("Contraseña actual incorrecta");
+            throw new RuntimeException("Contraseï¿½a actual incorrecta");
         }
 
-        // Actualizar contraseña
+        // Actualizar contraseï¿½a
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 

@@ -3,6 +3,7 @@ package com.ecommercepimo.ecommerce.config;
 import com.ecommercepimo.ecommerce.security.JwtAuthenticationEntryPoint;
 import com.ecommercepimo.ecommerce.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,7 +26,11 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
+/**
+ * Configuraci贸n de seguridad con JWT y CORS seguro
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -35,6 +40,12 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
+
+    @Value("${app.cors.allow-credentials}")
+    private boolean allowCredentials;
 
     private static final String[] PUBLIC_URLS = {
             "/api/auth/**",
@@ -48,53 +59,47 @@ public class SecurityConfig {
 
     private static final String[] ADMIN_URLS = {
             "/api/admin/**",
-            "/api/users/**"
+            "/api/products/*/predict-stock",
+            "/api/products/*/ml/**",
+            "/api/ml/**"
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Deshabilitar CSRF para APIs REST
+                // Deshabilitar CSRF para API REST
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // Configurar CORS
+                
+                // Configurar CORS seguro
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // Configurar autorizaci髇 de requests
-                .authorizeHttpRequests(auth -> auth
-                        // Endpoints p鷅licos
-                        .requestMatchers(PUBLIC_URLS).permitAll()
-
-                        // Productos - lectura p鷅lica, escritura admin
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
-
-                        // Orders - solo usuarios autenticados
-                        .requestMatchers("/api/orders/**").authenticated()
-
-                        // Admin endpoints
-                        .requestMatchers(ADMIN_URLS).hasRole("ADMIN")
-
-                        // Todos los dem醩 requieren autenticaci髇
-                        .anyRequest().authenticated()
-                )
-
+                
                 // Configurar manejo de excepciones
-                .exceptionHandling(ex -> ex
+                .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
                 )
-
-                // Configurar sesiones como stateless
+                
+                // Configurar gesti贸n de sesiones (stateless para JWT)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                // Configurar proveedor de autenticaci髇
-                .authenticationProvider(authenticationProvider())
-
-                // Agregar filtro JWT antes del filtro de autenticaci髇
+                
+                // Configurar autorizaci贸n de requests
+                .authorizeHttpRequests(authz -> authz
+                        // URLs p煤blicas (sin autenticaci贸n)
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        
+                        // URLs espec铆ficas para lectura p煤blica
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        
+                        // URLs que requieren rol ADMIN
+                        .requestMatchers(ADMIN_URLS).hasRole("ADMIN")
+                        
+                        // Todas las dem谩s requieren autenticaci贸n
+                        .anyRequest().authenticated()
+                )
+                
+                // Agregar filtro JWT antes del filtro de autenticaci贸n por username/password
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -122,20 +127,31 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Permitir or韌enes espec韋icos (configurar seg鷑 el frontend)
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        // Configurar or铆genes permitidos desde properties (sin "*" en producci贸n)
+        List<String> origins = Arrays.asList(allowedOrigins.split(","));
+        configuration.setAllowedOrigins(origins);
 
-        // M閠odos HTTP permitidos
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // M茅todos HTTP permitidos
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
 
         // Headers permitidos
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization", "Content-Type", "X-Requested-With", "Accept", 
+            "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"
+        ));
 
-        // Permitir credenciales
-        configuration.setAllowCredentials(true);
+        // Permitir credenciales solo si no se usa "*"
+        configuration.setAllowCredentials(allowCredentials && !origins.contains("*"));
 
         // Headers expuestos
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setExposedHeaders(Arrays.asList(
+            "Authorization", "X-Total-Count", "X-Pagination-Info"
+        ));
+
+        // Cache preflight por 1 hora
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

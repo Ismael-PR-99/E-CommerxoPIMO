@@ -1,0 +1,285 @@
+name: ML Service CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'ml-service/**'
+      - '.github/workflows/ml-service-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'ml-service/**'
+      - '.github/workflows/ml-service-ci.yml'
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  quality-checks:
+    name: Code Quality & Format Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./ml-service
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+
+    - name: Verificar formato con black
+      run: black --check --diff .
+
+    - name: Verificar imports con isort
+      run: isort --check-only --diff .
+
+    - name: Linting con flake8
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: Análisis completo con flake8
+      run: flake8 . --count --max-complexity=10 --max-line-length=88 --statistics
+
+    - name: Type checking con mypy
+      run: mypy app --ignore-missing-imports
+      continue-on-error: true
+
+  test:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    defaults:
+      run:
+        working-directory: ./ml-service
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_USER: testuser
+          POSTGRES_DB: ecommerce_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements-dev.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+
+    - name: Ejecutar tests con pytest
+      run: |
+        pytest \
+          --cov=app \
+          --cov-report=xml \
+          --cov-report=html \
+          --cov-report=term-missing \
+          --junit-xml=pytest-results.xml \
+          --cov-fail-under=80 \
+          -v
+      env:
+        DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/ecommerce_test
+        REDIS_URL: redis://localhost:6379/0
+        ENVIRONMENT: test
+
+    - name: Subir reporte de coverage a Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./ml-service/coverage.xml
+        flags: ml-service
+        name: ml-service-coverage
+        fail_ci_if_error: false
+
+    - name: Publicar resultados de tests
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: ML Service Test Results
+        path: ml-service/pytest-results.xml
+        reporter: java-junit
+        fail-on-error: true
+
+    - name: Archivar reportes de tests
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ml-service-test-reports
+        path: |
+          ml-service/htmlcov/
+          ml-service/coverage.xml
+          ml-service/pytest-results.xml
+        retention-days: 30
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./ml-service
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install safety bandit
+
+    - name: Scan de vulnerabilidades con Safety
+      run: safety check --json --output safety-report.json
+      continue-on-error: true
+
+    - name: Análisis de seguridad con Bandit
+      run: |
+        bandit -r app -f json -o bandit-report.json
+      continue-on-error: true
+
+    - name: Subir reportes de seguridad
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ml-security-reports
+        path: |
+          ml-service/safety-report.json
+          ml-service/bandit-report.json
+        retention-days: 30
+
+  build:
+    name: Build & Package
+    runs-on: ubuntu-latest
+    needs: [quality-checks, test]
+    defaults:
+      run:
+        working-directory: ./ml-service
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: Construir imagen Docker
+      run: |
+        docker build -t ecommerce-ml-service:${{ github.sha }} .
+        docker tag ecommerce-ml-service:${{ github.sha }} ecommerce-ml-service:latest
+
+    - name: Test imagen Docker
+      run: |
+        docker run --rm --name ml-test ecommerce-ml-service:${{ github.sha }} python -c "import app; print('ML service OK')"
+
+  performance-test:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: build
+    defaults:
+      run:
+        working-directory: ./ml-service
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_USER: testuser
+          POSTGRES_DB: ecommerce_test
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install locust
+
+    - name: Ejecutar tests de performance
+      run: |
+        # Iniciar el servicio ML en background
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+        sleep 10
+        
+        # Ejecutar tests de carga básicos
+        locust -f tests/performance/locustfile.py --headless -u 10 -r 2 -t 30s --host http://localhost:8000
+      env:
+        DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/ecommerce_test
+        REDIS_URL: redis://localhost:6379/0
+      continue-on-error: true

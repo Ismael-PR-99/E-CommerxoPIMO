@@ -3,7 +3,17 @@ package com.ecommercepimo.ecommerce.controller;
 import com.ecommercepimo.ecommerce.dto.*;
 import com.ecommercepimo.ecommerce.service.ProductService;
 import com.ecommercepimo.ecommerce.service.MLIntegrationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,27 +22,84 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Controlador REST para gesti贸n de productos
+ * Proporciona endpoints CRUD completos con validaci贸n y paginaci贸n
+ */
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 @CrossOrigin(origins = "*", maxAge = 3600)
+@Tag(name = "Products", description = "API para gesti贸n de productos del e-commerce")
 public class ProductController {
 
     private final ProductService productService;
     private final MLIntegrationService mlIntegrationService;
 
-    /**
-     * Obtener todos los productos activos
-     * GET /api/products
-     */
+    @Operation(
+        summary = "Listar productos con paginaci贸n",
+        description = "Obtiene una lista paginada de todos los productos activos del cat谩logo",
+        tags = {"Products"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Lista de productos obtenida exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Page.class),
+                examples = @ExampleObject(
+                    name = "productos_paginados",
+                    value = """
+                    {
+                        "content": [
+                            {
+                                "id": 1,
+                                "name": "Laptop Gaming ROG",
+                                "description": "Laptop para gaming de alta gama",
+                                "price": 1299.99,
+                                "stock": 15,
+                                "category": "Electr贸nicos",
+                                "imageUrl": "/images/laptop-rog.jpg",
+                                "active": true,
+                                "createdAt": "2024-01-15T10:30:00Z"
+                            }
+                        ],
+                        "pageable": {
+                            "page": 0,
+                            "size": 20,
+                            "sort": "name,asc"
+                        },
+                        "totalElements": 150,
+                        "totalPages": 8,
+                        "first": true,
+                        "last": false
+                    }
+                    """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+        )
+    })
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> getAllProducts(
+            @Parameter(
+                description = "Par谩metros de paginaci贸n",
+                example = "page=0&size=20&sort=name,asc"
+            )
             @PageableDefault(size = 20) Pageable pageable) {
 
         log.debug("Getting all products with pagination");
@@ -40,12 +107,64 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    /**
-     * Obtener producto por ID
-     * GET /api/products/{id}
-     */
+    @Operation(
+        summary = "Obtener producto por ID",
+        description = "Busca y retorna un producto espec铆fico usando su identificador 煤nico",
+        tags = {"Products"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Producto encontrado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ProductResponse.class),
+                examples = @ExampleObject(
+                    name = "producto_detalle",
+                    value = """
+                    {
+                        "id": 1,
+                        "name": "Laptop Gaming ROG",
+                        "description": "Laptop para gaming de alta gama con RTX 4070",
+                        "price": 1299.99,
+                        "stock": 15,
+                        "category": "Electr贸nicos",
+                        "imageUrl": "/images/laptop-rog.jpg",
+                        "active": true,
+                        "createdAt": "2024-01-15T10:30:00Z"
+                    }
+                    """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Producto no encontrado",
+            content = @Content(
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(
+                    value = """
+                    {
+                        "timestamp": "2024-01-15T10:30:00Z",
+                        "status": 404,
+                        "error": "Not Found",
+                        "message": "Producto con ID 999 no encontrado",
+                        "path": "/api/products/999"
+                    }
+                    """
+                )
+            )
+        )
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(
+            @Parameter(
+                description = "ID 煤nico del producto a buscar",
+                required = true,
+                example = "1",
+                schema = @Schema(type = "integer", minimum = "1")
+            )
+            @PathVariable @NotNull @Min(1) Long id) {
         log.debug("Getting product by ID: {}", id);
         ProductResponse product = productService.getProductById(id);
         return ResponseEntity.ok(product);
@@ -66,7 +185,7 @@ public class ProductController {
     }
 
     /**
-     * Obtener productos por categor韆
+     * Obtener productos por categor锟絘
      * GET /api/products/category/{category}
      */
     @GetMapping("/category/{category}")
@@ -106,7 +225,7 @@ public class ProductController {
     }
 
     /**
-     * Obtener categor韆s disponibles
+     * Obtener categor锟絘s disponibles
      * GET /api/products/categories
      */
     @GetMapping("/categories")
@@ -162,8 +281,8 @@ public class ProductController {
     @PatchMapping("/{id}/stock")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> updateStock(
-            @PathVariable Long id,
-            @RequestBody UpdateStockRequest request) {
+            @PathVariable @NotNull @Min(1) Long id,
+            @Valid @RequestBody UpdateStockRequest request) {
 
         log.info("Updating stock for product {}: {}", id, request.getNewStock());
         ProductResponse product = productService.updateStock(id, request.getNewStock());
@@ -185,7 +304,33 @@ public class ProductController {
         return ResponseEntity.ok(prediction);
     }
 
-    // DTO para actualizaci髇 de stock
+    /**
+     * Generar predicciones avanzadas de stock usando nuevo ML API
+     * POST /api/products/{id}/ml/predictions
+     */
+    @PostMapping("/{id}/ml/predictions")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> generateStockPredictions(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "30") Integer daysAhead) {
+
+        log.info("Generating ML stock predictions for product {}: {} days", id, daysAhead);
+        
+        try {
+            var prediction = mlIntegrationService.generateStockPredictions(id, daysAhead);
+            return ResponseEntity.ok(prediction);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid request for stock prediction: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Invalid request", "message", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error generating stock prediction for product {}", id, e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Internal server error", "message", "Error generando predicciones"));
+        }
+    }
+
+    // DTO para actualizaci锟絥 de stock
     public static class UpdateStockRequest {
         private Integer newStock;
 

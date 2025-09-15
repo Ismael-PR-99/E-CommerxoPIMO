@@ -4,6 +4,8 @@ import com.ecommercepimo.ecommerce.dto.*;
 import com.ecommercepimo.ecommerce.entity.Order;
 import com.ecommercepimo.ecommerce.service.OrderService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,15 +15,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Controlador de pedidos con validaciÃ³n completa
+ */
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class OrderController {
 
@@ -44,7 +51,7 @@ public class OrderController {
     }
 
     /**
-     * Obtener órdenes del usuario autenticado
+     * Obtener ï¿½rdenes del usuario autenticado
      * GET /api/orders/my-orders
      */
     @GetMapping("/my-orders")
@@ -60,7 +67,7 @@ public class OrderController {
     }
 
     /**
-     * Obtener orden específica por ID
+     * Obtener orden especï¿½fica por ID
      * GET /api/orders/{id}
      */
     @GetMapping("/{id}")
@@ -92,7 +99,7 @@ public class OrderController {
     }
 
     /**
-     * Obtener todas las órdenes (solo admins)
+     * Obtener todas las ï¿½rdenes (solo admins)
      * GET /api/orders/admin/all
      */
     @GetMapping("/admin/all")
@@ -106,7 +113,7 @@ public class OrderController {
     }
 
     /**
-     * Obtener órdenes por estado (solo admins)
+     * Obtener ï¿½rdenes por estado (solo admins)
      * GET /api/orders/admin/status/{status}
      */
     @GetMapping("/admin/status/{status}")
@@ -127,8 +134,8 @@ public class OrderController {
     @PatchMapping("/admin/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> updateOrderStatus(
-            @PathVariable Long id,
-            @RequestBody UpdateOrderStatusRequest request) {
+            @PathVariable @NotNull @Min(1) Long id,
+            @Valid @RequestBody UpdateOrderStatusRequest request) {
 
         log.info("Updating order {} status to: {}", id, request.getStatus());
         OrderResponse order = orderService.updateOrderStatus(id, request.getStatus());
@@ -136,7 +143,7 @@ public class OrderController {
     }
 
     /**
-     * Obtener estadísticas mensuales (solo admins)
+     * Obtener estadï¿½sticas mensuales (solo admins)
      * GET /api/orders/admin/stats/monthly
      */
     @GetMapping("/admin/stats/monthly")

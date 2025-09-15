@@ -2,8 +2,12 @@ package com.ecommercepimo.ecommerce.controller;
 
 import com.ecommercepimo.ecommerce.dto.UserResponse;
 import com.ecommercepimo.ecommerce.entity.User;
+import com.ecommercepimo.ecommerce.exception.UserNotFoundException;
 import com.ecommercepimo.ecommerce.mapper.UserMapper;
 import com.ecommercepimo.ecommerce.repository.UserRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,15 +15,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador de usuarios con validaciÃ³n completa
+ */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 @CrossOrigin(origins = "*", maxAge = 3600)
 @PreAuthorize("hasRole('ADMIN')")
 public class UserController {
@@ -46,11 +55,12 @@ public class UserController {
      * GET /api/users/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUserById(
+            @PathVariable @NotNull @Min(1) Long id) {
         log.debug("Getting user by ID: {}", id);
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         return ResponseEntity.ok(userMapper.toUserResponse(user));
     }
@@ -93,13 +103,13 @@ public class UserController {
      */
     @PatchMapping("/{id}/enabled")
     public ResponseEntity<UserResponse> toggleUserEnabled(
-            @PathVariable Long id,
-            @RequestBody EnableUserRequest request) {
+            @PathVariable @NotNull @Min(1) Long id,
+            @Valid @RequestBody EnableUserRequest request) {
 
         log.info("Toggling user {} enabled status: {}", id, request.getEnabled());
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         user.setEnabled(request.getEnabled());
         User updatedUser = userRepository.save(user);
@@ -113,13 +123,13 @@ public class UserController {
      */
     @PatchMapping("/{id}/role")
     public ResponseEntity<UserResponse> changeUserRole(
-            @PathVariable Long id,
-            @RequestBody ChangeRoleRequest request) {
+            @PathVariable @NotNull @Min(1) Long id,
+            @Valid @RequestBody ChangeRoleRequest request) {
 
         log.info("Changing user {} role to: {}", id, request.getRole());
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         user.setRole(request.getRole());
         User updatedUser = userRepository.save(user);
@@ -128,7 +138,7 @@ public class UserController {
     }
 
     /**
-     * Obtener estadísticas de usuarios
+     * Obtener estadï¿½sticas de usuarios
      * GET /api/users/stats
      */
     @GetMapping("/stats")
