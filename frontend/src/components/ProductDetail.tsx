@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { productService } from '../services/api';
 import { useCartStore } from '../store';
+import { fmtCurrency } from '../utils/format';
 import type { Product } from '../types';
 
 export const ProductDetail: React.FC = () => {
@@ -30,8 +31,17 @@ export const ProductDetail: React.FC = () => {
         <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Imagen del producto */}
-                <div className="bg-gray-200 rounded-lg h-96 flex items-center justify-center">
-                    <span className="text-gray-500">Imagen del producto</span>
+                <div className="bg-gray-200 rounded-lg h-96 overflow-hidden">
+                    <img 
+                        src={product.imageUrl} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.className = 'bg-gray-200 rounded-lg h-96 flex items-center justify-center';
+                            e.currentTarget.parentElement!.innerHTML = '<span class="text-gray-500">Imagen del producto</span>';
+                        }}
+                    />
                 </div>
 
                 {/* Información del producto */}
@@ -43,7 +53,7 @@ export const ProductDetail: React.FC = () => {
 
                     <div>
                         <p className="text-2xl font-bold text-blue-600">
-                            ${product.price.toFixed(2)}
+                            {fmtCurrency(product.price)}
                         </p>
                     </div>
 

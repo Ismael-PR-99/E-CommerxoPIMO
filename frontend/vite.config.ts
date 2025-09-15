@@ -14,13 +14,17 @@ export default defineConfig({
     }
   },
   server: {
-    host: '0.0.0.0', // Permite acceso desde cualquier IP de la red local
+    host: 'localhost', // Cambiar de 0.0.0.0 a localhost para Brave
     port: 5173,
-    strictPort: true, // No cambiar puerto automáticamente
+    strictPort: true,
     cors: true,
-    open: true, // Abrir navegador automáticamente
+    open: false, // No abrir automáticamente para evitar conflictos
     hmr: {
-      host: 'localhost' // Hot module replacement
+      host: 'localhost'
+    },
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'cross-origin',
+      'Cross-Origin-Opener-Policy': 'same-origin'
     }
   },
   preview: {

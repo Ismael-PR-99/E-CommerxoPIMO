@@ -19,8 +19,8 @@ export interface Product {
   stockQuantity?: number;
   minStockLevel?: number;
   sku: string;
-  imageUrl?: string;
-  image?: string;
+  // Ya no necesitamos imageUrl porque usamos SimpleProductImage
+  // que funciona directamente con el nombre del producto
   featured?: boolean;
   createdAt?: string;
   updatedAt?: string;

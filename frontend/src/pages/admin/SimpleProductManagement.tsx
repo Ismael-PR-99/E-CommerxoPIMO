@@ -396,7 +396,7 @@ const SimpleProductManagement: React.FC = () => {
                 }}>
                   <span style={{ color: '#059669', fontWeight: '600' }}>💰</span>
                   <span style={{ fontWeight: '600', color: '#1F2937' }}>
-                    ${product.price.toFixed(2)}
+                    {fmtCurrency(product.price)}
                   </span>
                 </div>
                 

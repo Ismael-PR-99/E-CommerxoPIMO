@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple para Brave</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>Test de Compatibilidad con Brave</h1>
+    
+    <div id="js-test" class="test">
+        ❌ JavaScript no ejecutado
+    </div>
+    
+    <div id="fetch-test" class="test">
+        ⏳ Probando fetch...
+    </div>
+    
+    <div id="image-test" class="test">
+        ⏳ Probando carga de imagen...
+        <br>
+        <img id="test-img" src="/images/productos/carne-mechada.png" style="max-width: 100px;" 
+             onerror="document.getElementById('image-test').innerHTML='❌ Error cargando imagen'; document.getElementById('image-test').className='test error';"
+             onload="document.getElementById('image-test').innerHTML='✅ Imagen cargada correctamente'; document.getElementById('image-test').className='test success';">
+    </div>
+    
+    <div class="test">
+        <a href="/store" target="_blank">🔗 Ir a la aplicación principal</a>
+    </div>
+
+    <script>
+        // Test JavaScript
+        document.getElementById('js-test').innerHTML = '✅ JavaScript funciona';
+        document.getElementById('js-test').className = 'test success';
+        
+        // Test Fetch
+        fetch('/images/productos/carne-mechada.png', { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('fetch-test').innerHTML = '✅ Fetch funciona - Imágenes accesibles';
+                    document.getElementById('fetch-test').className = 'test success';
+                } else {
+                    throw new Error('Response not OK');
+                }
+            })
+            .catch(error => {
+                document.getElementById('fetch-test').innerHTML = '❌ Error en fetch: ' + error.message;
+                document.getElementById('fetch-test').className = 'test error';
+            });
+    </script>
+</body>
+</html>

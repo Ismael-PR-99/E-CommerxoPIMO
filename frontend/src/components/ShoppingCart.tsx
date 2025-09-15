@@ -1,5 +1,6 @@
 import React from 'react';
 import { useCartStore } from '../store';
+import { fmtCurrency } from '../utils/format';
 import type { Product } from '../types';
 import { useQuery } from '@tanstack/react-query';
 import { productService } from '../services/api';
@@ -49,12 +50,12 @@ export const ShoppingCart: React.FC = () => {
                                             Cantidad: {item.quantity}
                                         </p>
                                         <p className="text-sm text-gray-500">
-                                            Precio unitario: ${product.price.toFixed(2)}
+                                            Precio unitario: {fmtCurrency(product.price)}
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <p className="font-medium">
-                                            ${(product.price * item.quantity).toFixed(2)}
+                                            {fmtCurrency(product.price * item.quantity)}
                                         </p>
                                         <button
                                             onClick={() => removeItem(item.productId)}

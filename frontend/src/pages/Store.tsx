@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { fmtCurrency } from '../utils/format';
+import { SimpleProductImage } from '../components/SimpleProductImage.tsx';
 
 interface CartItem {
   id: number;
@@ -17,7 +18,7 @@ const Store: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const categories = ['all', 'Electrónicos', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes'];
+  const categories = ['all', 'Charcutería', 'Jamones', 'Aceites'];
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -176,29 +177,6 @@ const Store: React.FC = () => {
               </span>
             )}
           </button>
-          
-          <button
-            onClick={() => {
-              console.log('Debug Store - Current products:', products);
-              if (products.length > 0) {
-                console.log('First product stock:', products[0].stock);
-                updateProductStock(products[0].id, 1);
-                console.log('After reducing 1 from first product');
-              }
-            }}
-            style={{
-              background: 'rgba(79, 70, 229, 0.2)',
-              border: 'none',
-              color: '#4f46e5',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '25px',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              fontWeight: '600'
-            }}
-          >
-            🔍 Test Stock
-          </button>
         </div>
       </header>
 
@@ -272,19 +250,23 @@ const Store: React.FC = () => {
                 border: '1px solid #e5e7eb'
               }}
             >
-              {/* Imagen placeholder */}
+              {/* Imagen del producto con SimpleProductImage */}
               <div style={{
                 width: '100%',
                 height: '200px',
-                background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
                 borderRadius: '10px',
                 marginBottom: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '3rem'
+                overflow: 'hidden',
+                backgroundColor: '#f3f4f6'
               }}>
-                📦
+                <SimpleProductImage
+                  productName={product.name}
+                  altText={product.name}
+                  style={{
+                    width: '100%',
+                    height: '100%'
+                  }}
+                />
               </div>
 
               <h3 style={{

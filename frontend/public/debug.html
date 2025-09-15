@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+</head>
+<body>
+    <h1>Test de debugging</h1>
+    <p>Si puedes ver esto, el servidor funciona correctamente.</p>
+    <script>
+        console.log('✅ JavaScript funciona');
+        fetch('/images/productos/carne-mechada.png')
+            .then(response => {
+                console.log('✅ Imagen accesible:', response.status);
+            })
+            .catch(error => {
+                console.error('❌ Error accediendo imagen:', error);
+            });
+    </script>
+</body>
+</html>

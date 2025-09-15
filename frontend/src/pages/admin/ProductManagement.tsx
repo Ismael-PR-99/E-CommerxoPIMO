@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useStore } from '../../store/useStore';
+import { fmtCurrency } from '../../utils/format';
 import { Product } from '../../types';
+import { SimpleProductImage } from '../../components/SimpleProductImage.tsx';
 
 interface NewProduct {
   name: string;
@@ -8,8 +10,6 @@ interface NewProduct {
   price: string;
   stock: string;
   category: string;
-  imageUrl: string;
-  featured: boolean;
 }
 
 const ProductManagement: React.FC = () => {
@@ -24,9 +24,7 @@ const ProductManagement: React.FC = () => {
     description: '',
     price: '',
     stock: '',
-    category: '',
-    imageUrl: '',
-    featured: false
+    category: ''
   });
 
   const categories = ['Electrónicos', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes'];
@@ -51,8 +49,6 @@ const ProductManagement: React.FC = () => {
       price: parseFloat(newProduct.price),
       stock: parseInt(newProduct.stock),
       category: newProduct.category,
-      image: newProduct.image || 'https://via.placeholder.com/200x200?text=Producto',
-      featured: newProduct.featured,
       sku: `SKU-${Date.now()}`
     };
 
@@ -62,9 +58,7 @@ const ProductManagement: React.FC = () => {
       description: '',
       price: '',
       stock: '',
-      category: '',
-      image: '',
-      featured: false
+      category: ''
     });
     setShowAddForm(false);
   };
@@ -76,9 +70,7 @@ const ProductManagement: React.FC = () => {
       description: product.description,
       price: product.price.toString(),
       stock: product.stock.toString(),
-      category: product.category,
-      image: product.image,
-      featured: product.featured
+      category: product.category
     });
     setShowAddForm(true);
   };
@@ -92,9 +84,7 @@ const ProductManagement: React.FC = () => {
       description: newProduct.description,
       price: parseFloat(newProduct.price),
       stock: parseInt(newProduct.stock),
-      category: newProduct.category,
-      image: newProduct.image,
-      featured: newProduct.featured
+      category: newProduct.category
     };
 
     updateProduct(updatedProduct);
@@ -104,9 +94,7 @@ const ProductManagement: React.FC = () => {
       description: '',
       price: '',
       stock: '',
-      category: '',
-      image: '',
-      featured: false
+      category: ''
     });
     setShowAddForm(false);
   };
@@ -143,32 +131,18 @@ const ProductManagement: React.FC = () => {
       )}
       
       <div style={{ display: 'flex', gap: '16px' }}>
-        <img 
-          src={product.image} 
-          alt={product.name}
+        <SimpleProductImage 
+          productName={product.name}
           style={{
             width: '80px',
             height: '80px',
             borderRadius: '8px',
-            objectFit: 'cover',
             background: '#f8f9fa'
           }}
         />
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <h3 style={{ margin: 0, fontSize: '18px', color: '#333' }}>{product.name}</h3>
-            {product.featured && (
-              <span style={{
-                background: '#F59E0B',
-                color: 'white',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                fontSize: '11px',
-                fontWeight: '500'
-              }}>
-                ⭐ Destacado
-              </span>
-            )}
           </div>
           <p style={{ 
             margin: '0 0 12px 0', 
@@ -184,7 +158,7 @@ const ProductManagement: React.FC = () => {
           </p>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '14px' }}>
             <span style={{ color: '#333', fontWeight: '500' }}>
-              💰 ${product.price.toFixed(2)}
+              💰 {fmtCurrency(product.price)}
             </span>
             <span style={{ 
               color: product.stock <= 10 ? '#EF4444' : '#10B981',
@@ -348,36 +322,6 @@ const ProductManagement: React.FC = () => {
         />
       </div>
 
-      <div style={{ marginTop: '16px' }}>
-        <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', color: '#333' }}>
-          URL de Imagen
-        </label>
-        <input
-          type="url"
-          value={newProduct.image}
-          onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
-          style={{
-            width: '100%',
-            padding: '10px',
-            border: '1px solid #ddd',
-            borderRadius: '6px',
-            fontSize: '14px'
-          }}
-          placeholder="https://ejemplo.com/imagen.jpg"
-        />
-      </div>
-
-      <div style={{ marginTop: '16px' }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-          <input
-            type="checkbox"
-            checked={newProduct.featured}
-            onChange={(e) => setNewProduct({ ...newProduct, featured: e.target.checked })}
-          />
-          <span style={{ fontSize: '14px', color: '#333' }}>⭐ Producto destacado</span>
-        </label>
-      </div>
-
       <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
         <button
           onClick={editingProduct ? handleUpdateProduct : handleAddProduct}
@@ -403,9 +347,7 @@ const ProductManagement: React.FC = () => {
               description: '',
               price: '',
               stock: '',
-              category: '',
-              image: '',
-              featured: false
+              category: ''
             });
           }}
           style={{
@@ -476,7 +418,7 @@ const ProductManagement: React.FC = () => {
         </div>
         <div className="glass-card" style={{ padding: '16px', textAlign: 'center' }}>
           <h3 style={{ margin: '0 0 4px 0', fontSize: '24px', color: '#10B981' }}>
-            ${products.reduce((sum, p) => sum + (p.price * p.stock), 0).toFixed(2)}
+            {fmtCurrency(products.reduce((sum, p) => sum + (p.price * p.stock), 0))}
           </h3>
           <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>Valor Total Inventario</p>
         </div>

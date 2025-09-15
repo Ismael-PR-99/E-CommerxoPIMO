@@ -488,7 +488,7 @@ const CleanProductManagement: React.FC = () => {
                   textAlign: 'center'
                 }}>
                   <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>
-                    ${product.price.toFixed(2)}
+                    {fmtCurrency(product.price)}
                   </div>
                   <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>
                     💰 Precio

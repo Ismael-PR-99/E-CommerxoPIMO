@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../store/useStore.ts';
+import { fmtCurrency } from '../utils/format';
 import type { Product } from '../types';
 
 const ProductList = () => {
@@ -46,7 +47,7 @@ const ProductList = () => {
                                 <p className="text-sm text-gray-600 mt-1">SKU: {product.sku}</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
+                                <p className="text-lg font-bold">{fmtCurrency(product.price)}</p>
                                 <p className={`text-sm ${
                                     product.stock <= 10
                                         ? 'text-red-500'

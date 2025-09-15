@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversor de Imágenes a Base64</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    header {
+      margin-bottom: 30px;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+    }
+    .file-input-container {
+      flex-grow: 1;
+      padding: 10px;
+      border: 2px dashed #ccc;
+      border-radius: 4px;
+      text-align: center;
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+    .file-input-container:hover {
+      border-color: #aaa;
+      background-color: #e8e8e8;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #0066cc;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0055b3;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .stats {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .results {
+      margin-top: 30px;
+    }
+    .result {
+      margin-top: 25px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #fff;
+    }
+    .result h3 {
+      margin-top: 0;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    .preview {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 15px 0;
+    }
+    .preview img {
+      max-width: 100px;
+      max-height: 100px;
+      border: 1px solid #eee;
+      border-radius: 4px;
+    }
+    .copy-btn {
+      background-color: #4caf50;
+      margin-top: 10px;
+    }
+    .copy-btn:hover {
+      background-color: #45a049;
+    }
+    .export-section {
+      margin-top: 30px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+    }
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .status.success {
+      background-color: #e6f7e6;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+    }
+    .custom-file-upload {
+      display: block;
+      padding: 10px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Conversor de Imágenes a Base64 para E-CommerxoPIMO</h1>
+    <p>Herramienta para convertir imágenes de productos a formato base64 y generar un archivo TypeScript con los datos.</p>
+  </header>
+
+  <section class="controls">
+    <label class="file-input-container" for="imageInput">
+      <span class="custom-file-upload">
+        <strong>Seleccionar archivos</strong>
+        <div>Arrastra imágenes aquí o haz clic para seleccionar</div>
+      </span>
+      <input type="file" id="imageInput" accept="image/*" multiple>
+    </label>
+    
+    <button id="convertBtn" disabled>Convertir Imágenes</button>
+    <button id="clearBtn" disabled>Limpiar Todo</button>
+  </section>
+  
+  <div class="stats" id="statsArea"></div>
+  
+  <div class="results" id="results"></div>
+  
+  <div class="export-section" id="exportSection" style="display: none;">
+    <h2>Exportar todo como archivo TypeScript</h2>
+    <div>
+      <label for="exportFilename">Nombre del archivo:</label>
+      <input type="text" id="exportFilename" value="images-base64.ts" style="margin-left: 10px;">
+    </div>
+    <textarea id="exportContent" rows="10"></textarea>
+    <button id="copyAllBtn" class="copy-btn">Copiar Todo</button>
+    <button id="downloadBtn" class="copy-btn" style="margin-left: 10px;">Descargar archivo .ts</button>
+    <div id="copyStatus" class="status" style="display: none;"></div>
+  </div>
+  
+  <script>
+    // Elementos DOM
+    const fileInput = document.getElementById('imageInput');
+    const convertBtn = document.getElementById('convertBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const resultsDiv = document.getElementById('results');
+    const statsArea = document.getElementById('statsArea');
+    const exportSection = document.getElementById('exportSection');
+    const exportContent = document.getElementById('exportContent');
+    const exportFilename = document.getElementById('exportFilename');
+    const copyAllBtn = document.getElementById('copyAllBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const copyStatus = document.getElementById('copyStatus');
+    
+    // Estado
+    let convertedImages = {};
+    
+    // Actualizar estado de los botones
+    function updateButtonStates() {
+      convertBtn.disabled = fileInput.files.length === 0;
+      clearBtn.disabled = fileInput.files.length === 0 && Object.keys(convertedImages).length === 0;
+      
+      // Mostrar estadísticas
+      if (fileInput.files.length > 0) {
+        statsArea.textContent = `${fileInput.files.length} imágenes seleccionadas`;
+      } else if (Object.keys(convertedImages).length > 0) {
+        statsArea.textContent = `${Object.keys(convertedImages).length} imágenes convertidas`;
+      } else {
+        statsArea.textContent = '';
+      }
+    }
+    
+    // Evento para manejar arrastre y soltar
+    const dropZone = document.querySelector('.file-input-container');
+    
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#0066cc';
+      dropZone.style.backgroundColor = '#e6f0fa';
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.style.borderColor = '#ccc';
+      dropZone.style.backgroundColor = '#f0f0f0';
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#ccc';
+      dropZone.style.backgroundColor = '#f0f0f0';
+      fileInput.files = e.dataTransfer.files;
+      updateButtonStates();
+    });
+    
+    // Evento cuando cambia la selección de archivos
+    fileInput.addEventListener('change', () => {
+      updateButtonStates();
+    });
+    
+    // Evento para limpiar todo
+    clearBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      resultsDiv.innerHTML = '';
+      convertedImages = {};
+      exportSection.style.display = 'none';
+      updateButtonStates();
+    });
+    
+    // Generar un nombre de variable JavaScript válido
+    function generateVariableName(fileName) {
+      // Quitar extensión y caracteres especiales
+      return fileName.split('.')[0]
+        .replace(/[^a-zA-Z0-9]/g, '_')
+        .toLowerCase();
+    }
+    
+    // Función para copiar al portapapeles
+    function copyToClipboard(text, statusElement, successMessage = 'Copiado al portapapeles') {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          statusElement.textContent = successMessage;
+          statusElement.style.display = 'block';
+          statusElement.className = 'status success';
+          setTimeout(() => {
+            statusElement.style.display = 'none';
+          }, 3000);
+        })
+        .catch(err => {
+          statusElement.textContent = 'Error al copiar: ' + err;
+          statusElement.style.display = 'block';
+          statusElement.className = 'status error';
+        });
+    }
+    
+    // Generar archivo TypeScript con todas las imágenes
+    function generateTypeScriptFile() {
+      if (Object.keys(convertedImages).length === 0) return;
+      
+      let content = `// Imágenes convertidas a base64 para garantizar la compatibilidad
+// Generado automáticamente - ${new Date().toLocaleString()}
+
+export const IMAGE_PLACEHOLDERS = {
+`;
+      
+      // Agregar cada imagen
+      for (const [name, data] of Object.entries(convertedImages)) {
+        content += `  ${name}: '${data.base64}',\n`;
+      }
+      
+      // Agregar placeholder por defecto
+      content += `  // Emoji por defecto para productos sin imagen
+  default: '📦' 
+};\n\n`;
+      
+      // Agregar función auxiliar
+      content += `// Busca una imagen por nombre o devuelve fallback
+export const getImageForProduct = (productName: string): string => {
+  // Convertir el nombre del producto a formato simple
+  const normalizedName = productName.toLowerCase()
+    .replace(/\\s+/g, '')
+    .normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "");
+  
+  // Buscar por palabra clave
+`;
+
+      // Generar reglas de coincidencia para cada imagen
+      for (const [name, data] of Object.entries(convertedImages)) {
+        const keywords = data.keywords.map(k => `normalizedName.includes('${k}')`).join(' || ');
+        content += `  if (${keywords}) {
+    return IMAGE_PLACEHOLDERS.${name};
+  }
+`;
+      }
+      
+      // Finalizar la función
+      content += `  
+  return IMAGE_PLACEHOLDERS.default;
+};\n`;
+      
+      exportContent.value = content;
+      exportSection.style.display = 'block';
+      
+      return content;
+    }
+    
+    // Evento para convertir imágenes
+    convertBtn.addEventListener('click', async () => {
+      resultsDiv.innerHTML = '';
+      
+      let totalSize = 0;
+      const fileCount = fileInput.files.length;
+      let processedCount = 0;
+      
+      for (const file of fileInput.files) {
+        try {
+          // Convertir imagen a base64
+          const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+          });
+          
+          // Crear el nombre de variable JavaScript
+          const variableName = generateVariableName(file.name);
+          
+          // Guardar en el objeto de imágenes convertidas
+          convertedImages[variableName] = {
+            originalName: file.name,
+            base64: base64,
+            size: Math.round(base64.length / 1024),
+            keywords: [variableName]
+          };
+          
+          // Actualizar tamaño total
+          totalSize += base64.length;
+          
+          // Crear resultado visual
+          const resultDiv = document.createElement('div');
+          resultDiv.className = 'result';
+          
+          // Crear la vista previa
+          const preview = document.createElement('div');
+          preview.className = 'preview';
+          
+          const previewImg = document.createElement('img');
+          previewImg.src = base64;
+          previewImg.alt = file.name;
+          
+          const previewInfo = document.createElement('div');
+          previewInfo.innerHTML = `
+            <strong>${file.name}</strong>
+            <div>Tamaño: ${Math.round(base64.length / 1024)} KB</div>
+          `;
+          
+          preview.appendChild(previewImg);
+          preview.appendChild(previewInfo);
+          
+          // Agregar información de keywords
+          const keywordsContainer = document.createElement('div');
+          keywordsContainer.innerHTML = `
+            <label>
+              <strong>Palabras clave para búsqueda:</strong> 
+              <small>(separadas por comas, se usarán para identificar esta imagen)</small>
+            </label>
+            <input type="text" class="keywords-input" data-var="${variableName}" value="${variableName}" style="width: 100%; padding: 5px; margin-top: 5px;">
+          `;
+          
+          // Creación del contenedor para el código base64
+          const codeContainer = document.createElement('div');
+          codeContainer.innerHTML = `
+            <p style="margin-top: 15px;"><strong>Código Base64:</strong></p>
+            <textarea>${base64}</textarea>
+            <button class="copy-btn" data-copy="${variableName}">Copiar Base64</button>
+          `;
+          
+          // Ensamblar el resultado
+          resultDiv.appendChild(preview);
+          resultDiv.appendChild(keywordsContainer);
+          resultDiv.appendChild(codeContainer);
+          resultsDiv.appendChild(resultDiv);
+          
+          // Configurar evento para copiar
+          const copyBtn = resultDiv.querySelector(`[data-copy="${variableName}"]`);
+          copyBtn.addEventListener('click', () => {
+            const textarea = copyBtn.previousElementSibling;
+            copyToClipboard(textarea.value, copyBtn, 'Copiado');
+          });
+          
+          // Configurar evento para actualizar keywords
+          const keywordsInput = resultDiv.querySelector(`[data-var="${variableName}"]`);
+          keywordsInput.addEventListener('change', (e) => {
+            const keywords = e.target.value.split(',').map(k => k.trim()).filter(k => k);
+            convertedImages[variableName].keywords = keywords;
+            generateTypeScriptFile();
+          });
+          
+          processedCount++;
+          
+          // Actualizar estadísticas
+          statsArea.textContent = `Procesando... ${processedCount}/${fileCount} imágenes`;
+          
+          // Si hemos procesado todas las imágenes, generar el archivo TypeScript
+          if (processedCount === fileCount) {
+            generateTypeScriptFile();
+            statsArea.textContent = `${fileCount} imágenes convertidas. Tamaño total: ${Math.round(totalSize / 1024)} KB`;
+          }
+        } catch (error) {
+          console.error(`Error al procesar ${file.name}:`, error);
+          
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'result';
+          errorDiv.innerHTML = `
+            <h3>Error: ${file.name}</h3>
+            <p style="color: red;">No se pudo procesar la imagen: ${error.message}</p>
+          `;
+          resultsDiv.appendChild(errorDiv);
+        }
+      }
+      
+      updateButtonStates();
+    });
+    
+    // Evento para copiar todo el contenido
+    copyAllBtn.addEventListener('click', () => {
+      copyToClipboard(exportContent.value, copyStatus);
+    });
+    
+    // Evento para descargar el archivo TypeScript
+    downloadBtn.addEventListener('click', () => {
+      const content = exportContent.value;
+      const filename = exportFilename.value.endsWith('.ts') 
+        ? exportFilename.value 
+        : `${exportFilename.value}.ts`;
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      copyStatus.textContent = `Archivo ${filename} descargado`;
+      copyStatus.style.display = 'block';
+      copyStatus.className = 'status success';
+      setTimeout(() => {
+        copyStatus.style.display = 'none';
+      }, 3000);
+    });
+    
+    // Inicializar
+    updateButtonStates();
+  </script>
+</body>
+</html>

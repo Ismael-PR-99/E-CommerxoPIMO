@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../store/useStore.ts';
+import { fmtCurrency } from '../utils/format';
 import type { Product } from '../types';
 
 const AdminPanel = () => {
@@ -105,11 +106,18 @@ const AdminPanel = () => {
               <tr key={product.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <img 
-                      className="h-10 w-10 rounded-lg object-cover" 
-                      src={product.imageUrl} 
-                      alt={product.name}
-                    />
+                    <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                      <img 
+                        className="h-full w-full object-cover" 
+                        src={product.imageUrl} 
+                        alt={product.name}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const container = e.currentTarget.parentElement!;
+                          container.innerHTML = '<span style="font-size: 1.2rem; color: #9CA3AF;">📦</span>';
+                        }}
+                      />
+                    </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">{product.name}</div>
                       <div className="text-sm text-gray-500">{product.sku}</div>
@@ -117,7 +125,7 @@ const AdminPanel = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  ${product.price.toFixed(2)}
+                  {fmtCurrency(product.price)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {product.stock}

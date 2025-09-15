@@ -17,7 +17,7 @@ interface Store {
   setUser: (user: User) => void;
 }
 
-// Datos de ejemplo - Productos de Chacinas Ibéricas
+// Datos de ejemplo - Productos de Charcutería y Aceites
 const sampleProducts: Product[] = [
   {
     id: 1,
@@ -26,9 +26,7 @@ const sampleProducts: Product[] = [
     price: 24.99,
     stock: 15,
     sku: "CM-IBE-3225",
-    category: "Embutidos",
-    imageUrl: "/images/productos/carne-mechada.jpg",
-    featured: true
+    category: "Charcutería"
   },
   {
     id: 2,
@@ -37,9 +35,7 @@ const sampleProducts: Product[] = [
     price: 18.99,
     stock: 25,
     sku: "CHI-CAD-3225",
-    category: "Embutidos",
-    imageUrl: "/images/productos/chicharron-cadiz.jpg",
-    featured: true
+    category: "Charcutería"
   },
   {
     id: 3,
@@ -48,29 +44,88 @@ const sampleProducts: Product[] = [
     price: 12.99,
     stock: 40,
     sku: "JAM-COC-500G",
-    category: "Jamones",
-    imageUrl: "/images/productos/jamon-cocido.jpg",
-    featured: true
+    category: "Jamones"
   },
   {
     id: 4,
+    name: "Pechuga de Pavo Asada",
+    description: "Pechuga de pavo asada, 400g de peso, ideal para bocadillos y platos ligeros",
+    price: 15.99,
+    stock: 30,
+    sku: "PEC-PAV-400G",
+    category: "Jamones"
+  },
+  {
+    id: 5,
     name: "Chorizo Ibérico de Bellota",
     description: "Chorizo ibérico de bellota curado en bodegas tradicionales de Extremadura",
     price: 32.99,
     stock: 12,
-    sku: "CHO-IBE-BELL-001",
-    category: "Embutidos",
-    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop"
+    sku: "CHO-IBE-BELL",
+    category: "Charcutería"
   },
   {
-    id: 5,
+    id: 6,
     name: "Lomo Embuchado Ibérico",
     description: "Lomo embuchado ibérico de bellota, curado al natural durante 4 meses",
     price: 45.99,
     stock: 8,
-    sku: "LOM-EMB-IBE-001",
-    category: "Embutidos",
-    imageUrl: "https://images.unsplash.com/photo-1568158879083-c42860933ed7?w=300&h=200&fit=crop"
+    sku: "LOM-EMB-IBE",
+    category: "Charcutería"
+  },
+  {
+    id: 7,
+    name: "Salchichón Ibérico Extra",
+    description: "Salchichón ibérico extra curado, elaborado con las mejores carnes seleccionadas",
+    price: 28.99,
+    stock: 18,
+    sku: "SAL-IBE-EXT",
+    category: "Charcutería"
+  },
+  {
+    id: 8,
+    name: "Morcilla de Burgos",
+    description: "Auténtica morcilla de Burgos, elaborada con arroz y especias tradicionales",
+    price: 12.99,
+    stock: 22,
+    sku: "MOR-BUR-001",
+    category: "Charcutería"
+  },
+  {
+    id: 9,
+    name: "Aceite de Oliva Virgen Extra Picual",
+    description: "Aceite de oliva virgen extra variedad Picual, primera extracción en frío - 500ml",
+    price: 19.99,
+    stock: 50,
+    sku: "AOL-PIC-500",
+    category: "Aceites"
+  },
+  {
+    id: 10,
+    name: "Aceite de Oliva Virgen Extra Arbequina",
+    description: "Aceite de oliva virgen extra variedad Arbequina, sabor suave y afrutado - 750ml",
+    price: 24.99,
+    stock: 35,
+    sku: "AOL-ARB-750",
+    category: "Aceites"
+  },
+  {
+    id: 11,
+    name: "Aceite de Oliva Ecológico Premium",
+    description: "Aceite de oliva ecológico premium, certificado orgánico - 1 litro",
+    price: 34.99,
+    stock: 20,
+    sku: "AOL-ECO-1L",
+    category: "Aceites"
+  },
+  {
+    id: 12,
+    name: "Aceite de Oliva con Romero",
+    description: "Aceite de oliva virgen extra aromatizado con romero natural - 250ml",
+    price: 16.99,
+    stock: 28,
+    sku: "AOL-ROM-250",
+    category: "Aceites"
   }
 ];
 
