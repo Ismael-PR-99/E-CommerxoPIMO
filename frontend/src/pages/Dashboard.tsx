@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
+import { Card } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
 
 const Dashboard: React.FC = () => {
   const { products, orders } = useStore();
@@ -28,242 +30,105 @@ const Dashboard: React.FC = () => {
 
   const recentOrders = orders.slice(0, 5);
 
-  const StatCard = ({ title, value, subtitle, icon, colorClass }: {
-    title: string;
+  const StatCard = ({ value, subtitle, icon, colorClass }: {
     value: string | number;
     subtitle: string;
     icon: React.ReactNode;
     colorClass: string;
   }) => (
-    <div className="glass-card" style={{
-      padding: '24px',
-      transition: 'all 0.3s ease',
-      cursor: 'pointer'
-    }}>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
+    <Card className="hover:shadow-xl transition-shadow cursor-pointer">
+      <div className="flex items-start justify-between">
         <div>
-          <p style={{
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#6b7280',
-            marginBottom: '8px'
-          }}>
-            {title}
-          </p>
-          <p style={{
-            fontSize: '32px',
-            fontWeight: '700',
-            color: colorClass,
-            marginBottom: '4px'
-          }}>
+          <p className="text-3xl font-semibold tabular-nums text-gray-900 mb-1">
             {value}
           </p>
-          <p style={{
-            fontSize: '12px',
-            color: '#9ca3af'
-          }}>
+          <p className="text-xs text-gray-500">
             {subtitle}
           </p>
         </div>
-        <div style={{
-          padding: '16px',
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(243, 244, 246, 0.5))',
-          borderRadius: '16px'
-        }}>
+        <span className={`ml-auto opacity-60 text-2xl ${colorClass}`}>
           {icon}
-        </div>
+        </span>
       </div>
-    </div>
+    </Card>
   );
 
   return (
     <div>
-      <div style={{
-        marginBottom: '32px'
-      }}>
-        <h1 style={{
-          fontSize: '28px',
-          fontWeight: '700',
-          color: '#1f2937',
-          marginBottom: '8px'
-        }}>
-          Dashboard
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
+          Dashboard - Chacinas Ibéricas
         </h1>
-        <p style={{
-          color: '#6b7280',
-          fontSize: '16px'
-        }}>
-          Resumen del inventario y actividad reciente
+        <p className="text-gray-600">
+          Gestión de productos ibéricos de calidad premium
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '24px',
-        marginBottom: '32px'
-      }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <StatCard
-          title="Total Productos"
           value={stats.totalProducts}
           subtitle="En inventario"
-          colorClass="#059669"
-          icon={
-            <svg style={{ width: '24px', height: '24px', color: '#059669' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          }
+          colorClass="text-green-600"
+          icon="📦"
         />
         
         <StatCard
-          title="Stock Bajo"
           value={stats.lowStockProducts}
           subtitle="≤ 10 unidades"
-          colorClass="#f59e0b"
-          icon={
-            <svg style={{ width: '24px', height: '24px', color: '#f59e0b' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          }
+          colorClass="text-amber-600"
+          icon="⚠️"
         />
 
         <StatCard
-          title="Sin Stock"
           value={stats.outOfStockProducts}
           subtitle="Agotados"
-          colorClass="#dc2626"
-          icon={
-            <svg style={{ width: '24px', height: '24px', color: '#dc2626' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          }
+          colorClass="text-red-600"
+          icon="❌"
         />
 
         <StatCard
-          title="Valor Total"
           value={`$${stats.totalValue.toLocaleString()}`}
           subtitle="Inventario"
-          colorClass="#3b82f6"
-          icon={
-            <svg style={{ width: '24px', height: '24px', color: '#3b82f6' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-            </svg>
-          }
+          colorClass="text-blue-600"
+          icon="💰"
         />
       </div>
 
       {/* Recent Orders */}
-      <div className="glass-card" style={{
-        padding: '32px'
-      }}>
-        <h2 style={{
-          fontSize: '20px',
-          fontWeight: '600',
-          color: '#1f2937',
-          marginBottom: '24px'
-        }}>
+      <Card>
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">
           Órdenes Recientes
         </h2>
         
         {recentOrders.length > 0 ? (
-          <div style={{
-            overflowX: 'auto'
-          }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse'
-            }}>
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
               <thead>
-                <tr style={{
-                  borderBottom: '1px solid #e5e7eb'
-                }}>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '12px 0',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#6b7280'
-                  }}>
-                    ID
-                  </th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '12px 0',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#6b7280'
-                  }}>
-                    Cliente
-                  </th>
-                  <th style={{
-                    textAlign: 'left',
-                    padding: '12px 0',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#6b7280'
-                  }}>
-                    Estado
-                  </th>
-                  <th style={{
-                    textAlign: 'right',
-                    padding: '12px 0',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#6b7280'
-                  }}>
-                    Total
-                  </th>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Cliente</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Estado</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Total</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {recentOrders.map((order) => (
-                  <tr key={order.id} style={{
-                    borderBottom: '1px solid #f3f4f6'
-                  }}>
-                    <td style={{
-                      padding: '16px 0',
-                      fontSize: '14px',
-                      color: '#1f2937'
-                    }}>
-                      #{order.id}
-                    </td>
-                    <td style={{
-                      padding: '16px 0',
-                      fontSize: '14px',
-                      color: '#1f2937'
-                    }}>
-                      {order.customerName}
-                    </td>
-                    <td style={{
-                      padding: '16px 0'
-                    }}>
-                      <span style={{
-                        padding: '4px 12px',
-                        borderRadius: '8px',
-                        fontSize: '12px',
-                        fontWeight: '500',
-                        backgroundColor: order.status === 'delivered' ? '#dcfce7' : 
-                                       order.status === 'pending' ? '#fef3c7' : '#fce7f3',
-                        color: order.status === 'delivered' ? '#059669' : 
-                               order.status === 'pending' ? '#f59e0b' : '#be185d'
-                      }}>
+                  <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 text-sm text-gray-900">#{order.id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{order.customerName}</td>
+                    <td className="px-6 py-4">
+                      <Badge variant={
+                        order.status === 'delivered' ? 'success' :
+                        order.status === 'processing' ? 'info' :
+                        order.status === 'shipped' ? 'neutral' : 'warning'
+                      }>
                         {order.status === 'delivered' ? 'Entregado' :
                          order.status === 'pending' ? 'Pendiente' : 
                          order.status === 'processing' ? 'Procesando' : 'Enviado'}
-                      </span>
+                      </Badge>
                     </td>
-                    <td style={{
-                      textAlign: 'right',
-                      padding: '16px 0',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: '#1f2937'
-                    }}>
+                    <td className="px-6 py-4 text-right tabular-nums text-sm text-gray-900">
                       ${order.total.toLocaleString()}
                     </td>
                   </tr>
@@ -272,23 +137,14 @@ const Dashboard: React.FC = () => {
             </table>
           </div>
         ) : (
-          <div style={{
-            textAlign: 'center',
-            padding: '40px',
-            color: '#6b7280'
-          }}>
-            <svg style={{
-              width: '48px',
-              height: '48px',
-              margin: '0 auto 16px',
-              color: '#d1d5db'
-            }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center py-10 text-gray-500">
+            <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             <p>No hay órdenes recientes</p>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 };

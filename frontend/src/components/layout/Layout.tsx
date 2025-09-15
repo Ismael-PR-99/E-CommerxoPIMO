@@ -5,29 +5,13 @@ import Header from '../Header';
 
 const Layout: React.FC = () => {
   return (
-    <div className="page-background">
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        position: 'relative',
-        zIndex: 10
-      }}>
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex relative z-10">
         <Sidebar />
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          minHeight: '100vh'
-        }}>
+        <div className="flex-1 flex flex-col">
           <Header />
-          <main style={{
-            flex: 1,
-            padding: '24px'
-          }}>
-            <div className="glass-card" style={{
-              padding: '32px',
-              minHeight: 'auto'
-            }}>
+          <main className="flex-1">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <Outlet />
             </div>
           </main>

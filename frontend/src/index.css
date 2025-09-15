@@ -3,6 +3,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root{
+  --radius: 1rem; /* 16px ≈ rounded-2xl */
+  --card-bg: #ffffff;
+  --muted: #6b7280; /* gray-500 */
+  --shadow: 0 10px 30px rgba(0,0,0,0.08);
+  --ring: 0 0 0 1px rgba(0,0,0,0.05);
+
+  --success-bg:#dcfce7; --success-fg:#166534;
+  --warning-bg:#fef9c3; --warning-fg:#854d0e;
+  --info-bg:#e0e7ff;    --info-fg:#3730a3;
+  --danger-bg:#fee2e2;  --danger-fg:#991b1b;
+}
+
+/* Utilidades opcionales */
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* Reset básico */
 * {
   margin: 0;
   padding: 0;
@@ -14,15 +31,91 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
   color: #1f2937;
+  background-color: #f9fafb;
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* Asegurar que los elementos básicos tengan estilos */
+.min-h-screen {
+  min-height: 100vh !important;
+}
+
+.bg-gray-50 {
+  background-color: #f9fafb !important;
+}
+
+/* Estilos de respaldo para componentes */
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.rounded-2xl {
+  border-radius: 1rem !important;
+}
+
+.p-6 {
+  padding: 1.5rem !important;
+}
+
+.flex {
+  display: flex !important;
+}
+
+.items-center {
+  align-items: center !important;
+}
+
+.justify-between {
+  justify-content: space-between !important;
+}
+
+.text-gray-900 {
+  color: #111827 !important;
+}
+
+.text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.grid {
+  display: grid !important;
+}
+
+.gap-6 {
+  gap: 1.5rem !important;
+}
+
+.mb-8 {
+  margin-bottom: 2rem !important;
+}
+
+.text-3xl {
+  font-size: 1.875rem !important;
+  line-height: 2.25rem !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
+.font-semibold {
+  font-weight: 600 !important;
 }
 
 /* Background patterns */

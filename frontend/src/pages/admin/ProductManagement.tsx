@@ -8,6 +8,8 @@ interface NewProduct {
   price: string;
   stock: string;
   category: string;
+  imageUrl: string;
+  featured: boolean;
 }
 
 const ProductManagement: React.FC = () => {
@@ -23,7 +25,7 @@ const ProductManagement: React.FC = () => {
     price: '',
     stock: '',
     category: '',
-    image: '',
+    imageUrl: '',
     featured: false
   });
 
@@ -109,7 +111,7 @@ const ProductManagement: React.FC = () => {
     setShowAddForm(false);
   };
 
-  const ProductCard = ({ product }: { product: StoreProduct }) => (
+  const ProductCard = ({ product }: { product: Product }) => (
     <div className="glass-card" style={{
       padding: '24px',
       display: 'flex',

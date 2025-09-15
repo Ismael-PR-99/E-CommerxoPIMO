@@ -17,101 +17,117 @@ interface Store {
   setUser: (user: User) => void;
 }
 
-// Datos de ejemplo
+// Datos de ejemplo - Productos de Chacinas Ibéricas
 const sampleProducts: Product[] = [
   {
     id: 1,
-    name: "Laptop Dell XPS 13",
-    description: "Laptop ultraligera con procesador Intel i7 y 16GB RAM",
-    price: 1299.99,
+    name: "Carne Mechada Ibérica",
+    description: "Deliciosa carne mechada de cerdo ibérico, curada artesanalmente con especias tradicionales",
+    price: 24.99,
     stock: 15,
-    sku: "DELL-XPS13-001",
-    category: "Laptops",
-    imageUrl: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=200&fit=crop"
+    sku: "CM-IBE-3225",
+    category: "Embutidos",
+    imageUrl: "/images/productos/carne-mechada.jpg",
+    featured: true
   },
   {
     id: 2,
-    name: "iPhone 14 Pro",
-    description: "Smartphone Apple con cámara avanzada y chip A16",
-    price: 999.99,
-    stock: 8,
-    sku: "APPLE-IP14P-001",
-    category: "Smartphones",
-    imageUrl: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=200&fit=crop"
+    name: "Chicharrón de Cádiz",
+    description: "Auténtico chicharrón gaditano, cortado en lonchas finas, ideal para tapas",
+    price: 18.99,
+    stock: 25,
+    sku: "CHI-CAD-3225",
+    category: "Embutidos",
+    imageUrl: "/images/productos/chicharron-cadiz.jpg",
+    featured: true
   },
   {
     id: 3,
-    name: "Monitor Samsung 27\"",
-    description: "Monitor 4K UHD con panel IPS y 144Hz",
-    price: 399.99,
-    stock: 22,
-    sku: "SAM-MON27-001",
-    category: "Monitores",
-    imageUrl: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=300&h=200&fit=crop"
+    name: "Jamón Cocido Extra Premium",
+    description: "Jamón cocido extra de primera calidad, 500g en lonchas finas perfectas",
+    price: 12.99,
+    stock: 40,
+    sku: "JAM-COC-500G",
+    category: "Jamones",
+    imageUrl: "/images/productos/jamon-cocido.jpg",
+    featured: true
   },
   {
     id: 4,
-    name: "Teclado Mecánico RGB",
-    description: "Teclado gaming con switches Cherry MX Blue",
-    price: 129.99,
-    stock: 45,
-    sku: "MECH-KB-RGB-001",
-    category: "Accesorios",
-    imageUrl: "https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=300&h=200&fit=crop"
+    name: "Chorizo Ibérico de Bellota",
+    description: "Chorizo ibérico de bellota curado en bodegas tradicionales de Extremadura",
+    price: 32.99,
+    stock: 12,
+    sku: "CHO-IBE-BELL-001",
+    category: "Embutidos",
+    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop"
   },
   {
     id: 5,
-    name: "Auriculares Sony WH-1000XM4",
-    description: "Auriculares inalámbricos con cancelación de ruido",
-    price: 299.99,
-    stock: 3,
-    sku: "SONY-WH1000-001",
-    category: "Audio",
-    imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=200&fit=crop"
+    name: "Lomo Embuchado Ibérico",
+    description: "Lomo embuchado ibérico de bellota, curado al natural durante 4 meses",
+    price: 45.99,
+    stock: 8,
+    sku: "LOM-EMB-IBE-001",
+    category: "Embutidos",
+    imageUrl: "https://images.unsplash.com/photo-1568158879083-c42860933ed7?w=300&h=200&fit=crop"
   }
 ];
 
 const sampleOrders: Order[] = [
   {
     id: 1,
-    customerName: "Juan Pérez",
-    total: 1429.98,
+    customerName: "María José Ruiz",
+    total: 43.98,
     status: 'delivered',
     date: '2024-01-15T10:30:00Z',
     items: [
-      { id: 1, name: "Laptop Dell XPS 13", quantity: 1, price: 1299.99 },
-      { id: 4, name: "Teclado Mecánico RGB", quantity: 1, price: 129.99 }
+      { id: 1, name: "Carne Mechada Ibérica", quantity: 1, price: 24.99 },
+      { id: 2, name: "Chicharrón de Cádiz", quantity: 1, price: 18.99 }
     ]
   },
   {
     id: 2,
-    customerName: "María García",
-    total: 999.99,
+    customerName: "Antonio García",
+    total: 57.98,
     status: 'processing',
     date: '2024-01-16T14:20:00Z',
     items: [
-      { id: 2, name: "iPhone 14 Pro", quantity: 1, price: 999.99 }
+      { id: 3, name: "Jamón Cocido Extra Premium", quantity: 2, price: 12.99 },
+      { id: 4, name: "Chorizo Ibérico de Bellota", quantity: 1, price: 32.99 }
     ]
   },
   {
     id: 3,
-    customerName: "Carlos López",
-    total: 729.98,
+    customerName: "Carmen López",
+    total: 91.97,
     status: 'shipped',
     date: '2024-01-17T09:15:00Z',
     items: [
-      { id: 3, name: "Monitor Samsung 27\"", quantity: 1, price: 399.99 },
-      { id: 5, name: "Auriculares Sony WH-1000XM4", quantity: 1, price: 299.99 }
+      { id: 5, name: "Lomo Embuchado Ibérico", quantity: 1, price: 45.99 },
+      { id: 1, name: "Carne Mechada Ibérica", quantity: 1, price: 24.99 },
+      { id: 2, name: "Chicharrón de Cádiz", quantity: 1, price: 18.99 }
     ]
   },
   {
     id: 4,
-    customerName: "Ana Martínez",
-    total: 129.99,
+    customerName: "Francisco Moreno",
+    total: 25.98,
     status: 'pending',
     date: '2024-01-18T16:45:00Z',
     items: [
-      { id: 4, name: "Teclado Mecánico RGB", quantity: 1, price: 129.99 }
+      { id: 3, name: "Jamón Cocido Extra Premium", quantity: 2, price: 12.99 }
+    ]
+  },
+  {
+    id: 5,
+    customerName: "Isabel Fernández",
+    total: 78.98,
+    status: 'delivered',
+    date: '2024-01-19T11:20:00Z',
+    items: [
+      { id: 4, name: "Chorizo Ibérico de Bellota", quantity: 1, price: 32.99 },
+      { id: 5, name: "Lomo Embuchado Ibérico", quantity: 1, price: 45.99 }
     ]
   }
 ];

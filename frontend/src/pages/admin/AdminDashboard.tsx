@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
+import { Card } from '../../components/ui/Card';
 
 interface AdminStats {
   totalProducts: number;
@@ -50,32 +51,26 @@ const AdminDashboard: React.FC = () => {
     onClick?: () => void;
   }) => (
     <div 
-      className="glass-card"
+      className={`transition-all duration-300 hover:shadow-xl ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
       onClick={onClick}
-      style={{
-        padding: '24px',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'all 0.3s ease',
-        border: `2px solid ${color}20`,
-        background: `linear-gradient(135deg, ${color}08, ${color}04)`
-      }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <p style={{ fontSize: '14px', color: '#666', margin: '0 0 8px 0' }}>{title}</p>
-          <h3 style={{ fontSize: '28px', color: '#333', margin: '0 0 4px 0', fontWeight: '700' }}>
-            {typeof value === 'number' ? value.toLocaleString() : value}
-          </h3>
-          <p style={{ fontSize: '12px', color: '#888', margin: 0 }}>{subtitle}</p>
+      <Card>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-600 mb-2">{title}</p>
+            <h3 className="text-3xl font-bold text-gray-900 mb-1 tabular-nums">
+              {typeof value === 'number' ? value.toLocaleString() : value}
+            </h3>
+            <p className="text-xs text-gray-500">{subtitle}</p>
+          </div>
+          <div 
+            className="text-3xl opacity-70"
+            style={{ color: color }}
+          >
+            {icon}
+          </div>
         </div>
-        <div style={{
-          fontSize: '32px',
-          color: color,
-          opacity: 0.7
-        }}>
-          {icon}
-        </div>
-      </div>
+      </Card>
     </div>
   );
 
@@ -87,51 +82,42 @@ const AdminDashboard: React.FC = () => {
     onClick: () => void;
   }) => (
     <div 
-      className="glass-card"
+      className="cursor-pointer transition-all duration-300 hover:shadow-xl"
       onClick={onClick}
-      style={{
-        padding: '20px',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        border: `1px solid ${color}30`
-      }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <div style={{
-          fontSize: '24px',
-          color: color,
-          background: `${color}20`,
-          padding: '12px',
-          borderRadius: '8px'
-        }}>
-          {icon}
+      <Card>
+        <div className="flex items-center gap-4">
+          <div 
+            className="text-2xl p-3 rounded-lg"
+            style={{ 
+              color: color,
+              backgroundColor: `${color}20`
+            }}
+          >
+            {icon}
+          </div>
+          <div>
+            <h4 className="text-lg font-medium text-gray-900 mb-1">{title}</h4>
+            <p className="text-sm text-gray-600">{description}</p>
+          </div>
         </div>
-        <div>
-          <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#333' }}>{title}</h4>
-          <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>{description}</p>
-        </div>
-      </div>
+      </Card>
     </div>
   );
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '32px', color: '#333', margin: '0 0 8px 0', fontWeight: '700' }}>
-          🏪 Panel de Administración
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          🥓 Panel de Administración - Chacinas Ibéricas
         </h1>
-        <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>
-          Gestiona tu tienda, productos y órdenes desde aquí
+        <p className="text-gray-600 text-lg">
+          Gestiona tu tienda de productos ibéricos premium
         </p>
       </div>
 
       {/* Estadísticas Principales */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: '24px',
-        marginBottom: '32px'
-      }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <AdminCard
           title="Total Productos"
           value={stats.totalProducts}
@@ -165,51 +151,43 @@ const AdminDashboard: React.FC = () => {
 
       {/* Alertas */}
       {(stats.lowStockAlerts > 0 || stats.pendingOrders > 0) && (
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '20px', color: '#333', margin: '0 0 16px 0' }}>🚨 Alertas</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">🚨 Alertas</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {stats.lowStockAlerts > 0 && (
-              <div className="glass-card" style={{
-                padding: '16px',
-                border: '2px solid #EF444420',
-                background: 'linear-gradient(135deg, #EF444408, #EF444404)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '24px' }}>⚠️</span>
+              <Card className="border-red-200 bg-red-50">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">⚠️</span>
                   <div>
-                    <h4 style={{ margin: '0 0 4px 0', color: '#EF4444' }}>Stock Bajo</h4>
-                    <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
+                    <h4 className="font-medium text-red-700 mb-1">Stock Bajo</h4>
+                    <p className="text-sm text-gray-600">
                       {stats.lowStockAlerts} productos necesitan reposición
                     </p>
                   </div>
                 </div>
-              </div>
+              </Card>
             )}
             {stats.pendingOrders > 0 && (
-              <div className="glass-card" style={{
-                padding: '16px',
-                border: '2px solid #F59E0B20',
-                background: 'linear-gradient(135deg, #F59E0B08, #F59E0B04)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '24px' }}>⏰</span>
+              <Card className="border-amber-200 bg-amber-50">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">⏰</span>
                   <div>
-                    <h4 style={{ margin: '0 0 4px 0', color: '#F59E0B' }}>Órdenes Pendientes</h4>
-                    <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
+                    <h4 className="font-medium text-amber-700 mb-1">Órdenes Pendientes</h4>
+                    <p className="text-sm text-gray-600">
                       {stats.pendingOrders} órdenes esperan procesamiento
                     </p>
                   </div>
                 </div>
-              </div>
+              </Card>
             )}
           </div>
         </div>
       )}
 
       {/* Acciones Rápidas */}
-      <div style={{ marginBottom: '32px' }}>
-        <h2 style={{ fontSize: '20px', color: '#333', margin: '0 0 16px 0' }}>⚡ Acciones Rápidas</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">⚡ Acciones Rápidas</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <QuickAction
             title="Agregar Producto"
             description="Añadir nuevo producto al catálogo"
@@ -263,46 +241,38 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Resumen de Actividad Reciente */}
-      <div className="glass-card" style={{ padding: '24px' }}>
-        <h2 style={{ fontSize: '20px', color: '#333', margin: '0 0 16px 0' }}>📋 Actividad Reciente</h2>
-        <div style={{ display: 'grid', gap: '12px' }}>
+      <Card>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">📋 Actividad Reciente</h2>
+        <div className="space-y-3">
           {orders.slice(0, 5).map((order, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px',
-              background: '#f8f9fa',
-              borderRadius: '8px',
-              border: '1px solid #e9ecef'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '16px' }}>
+            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">
                   {order.status === 'pending' ? '⏳' : 
                    order.status === 'processing' ? '🔄' : 
                    order.status === 'delivered' ? '✅' : '📦'}
                 </span>
                 <div>
-                  <p style={{ margin: '0 0 2px 0', fontWeight: '500', fontSize: '14px' }}>
+                  <p className="font-medium text-sm text-gray-900 mb-0.5">
                     Orden #{order.id}
                   </p>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>
+                  <p className="text-xs text-gray-600">
                     Cliente - {order.status}
                   </p>
                 </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ margin: '0 0 2px 0', fontWeight: '500', fontSize: '14px' }}>
+              <div className="text-right">
+                <p className="font-medium text-sm text-gray-900 mb-0.5">
                   ${order.total.toFixed(2)}
                 </p>
-                <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>
+                <p className="text-xs text-gray-600">
                   {order.date}
                 </p>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

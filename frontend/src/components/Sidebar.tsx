@@ -82,44 +82,24 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="glass-card" style={{
-      width: '256px',
-      height: '100vh',
-      position: 'sticky',
-      top: 0,
-      padding: '24px 0'
-    }}>
-      <div style={{ padding: '0 24px', marginBottom: '32px' }}>
-        <div style={{
-          fontSize: '20px',
-          fontWeight: '700',
-          background: 'linear-gradient(to right, #3b82f6, #9333ea)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}>
-          E-CommerxoPIMO
+    <aside className="w-64 shrink-0 h-screen sticky top-0 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-r border-gray-200">
+      <nav className="h-full overflow-y-auto p-4">
+        <div className="px-4 mb-8">
+          <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            E-CommerxoPIMO
+          </div>
         </div>
-      </div>
 
-      <nav>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        <ul className="space-y-1">
           {navItems.map((item) => (
-            <li key={item.path} style={{ marginBottom: '4px' }}>
+            <li key={item.path}>
               <NavLink
                 to={item.path}
-                style={({ isActive }) => ({
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 24px',
-                  color: isActive ? '#3b82f6' : '#64748b',
-                  backgroundColor: isActive ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-                  textDecoration: 'none',
-                  fontSize: '14px',
-                  fontWeight: isActive ? '500' : '400',
-                  transition: 'all 0.3s ease',
-                  borderRight: isActive ? '3px solid #3b82f6' : '3px solid transparent'
-                })}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                    isActive ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600' : 'text-gray-700 hover:bg-gray-100'
+                  }`
+                }
               >
                 {item.icon}
                 {item.name}
@@ -129,41 +109,23 @@ const Sidebar: React.FC = () => {
         </ul>
 
         {/* Separador de Administración */}
-        <div style={{
-          margin: '24px 24px 16px 24px',
-          paddingTop: '16px',
-          borderTop: '1px solid rgba(148, 163, 184, 0.2)'
-        }}>
-          <div style={{
-            fontSize: '12px',
-            fontWeight: '600',
-            color: '#94a3b8',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
-            Administración
-          </div>
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            ADMINISTRACIÓN
+          </p>
         </div>
 
         {/* Elementos de Admin */}
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        <ul className="space-y-1">
           {adminItems.map((item) => (
-            <li key={item.path} style={{ marginBottom: '4px' }}>
+            <li key={item.path}>
               <NavLink
                 to={item.path}
-                style={({ isActive }) => ({
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 24px',
-                  color: isActive ? '#dc2626' : '#64748b',
-                  backgroundColor: isActive ? 'rgba(220, 38, 38, 0.1)' : 'transparent',
-                  textDecoration: 'none',
-                  fontSize: '14px',
-                  fontWeight: isActive ? '500' : '400',
-                  transition: 'all 0.3s ease',
-                  borderRight: isActive ? '3px solid #dc2626' : '3px solid transparent'
-                })}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                    isActive ? 'bg-red-50 text-red-700 border-r-2 border-red-600' : 'text-gray-700 hover:bg-gray-100'
+                  }`
+                }
               >
                 {item.icon}
                 {item.name}

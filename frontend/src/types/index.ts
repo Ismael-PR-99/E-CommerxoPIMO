@@ -20,6 +20,8 @@ export interface Product {
   minStockLevel?: number;
   sku: string;
   imageUrl?: string;
+  image?: string;
+  featured?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
