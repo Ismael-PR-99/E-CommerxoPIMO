@@ -33,19 +33,19 @@ export default {
           900: '#4c1d95',
           950: '#2e1065',
         },
-        // Paleta Brand para E-Commerce PIMO
+        // Paleta Brand burdeos (vino)
         brand: {
-          50: '#fef7ee',
-          100: '#fdedd3',
-          200: '#fcd9a5',
-          300: '#f9c06d',
-          400: '#f59e32',
-          500: '#f28515', // Color principal naranja
-          600: '#e36d0b',
-          700: '#bd530c',
-          800: '#964212',
-          900: '#7a3712',
-          950: '#421c07',
+          50: '#fcf5f7',
+          100: '#f8e7ec',
+          200: '#f1cbd6',
+          300: '#e5a4b7',
+          400: '#d46e8d',
+          500: '#b8325b', // Color principal burdeos
+          600: '#9d284d',
+          700: '#7e1f3e',
+          800: '#651a33',
+          900: '#53172b',
+          950: '#300a16',
         },
         // Estados para badges y notificaciones
         state: {
@@ -95,7 +95,7 @@ export default {
       },
       boxShadow: {
         'card': '0px 4px 12px rgba(0, 0, 0, 0.05)',
-        'card-hover': '0px 8px 24px rgba(0, 0, 0, 0.1)',
+        'card-hover': '0px 8px 24px rgba(0, 0, 0, 0.12)',
         'button': '0px 2px 4px rgba(0, 0, 0, 0.1)',
       },
       spacing: {

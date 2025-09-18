@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../store';
 import { fmtCurrency } from '../utils/format';
 import type { Product } from '../types';
@@ -6,7 +7,9 @@ import { useQuery } from '@tanstack/react-query';
 import { productService } from '../services/api';
 
 export const ShoppingCart: React.FC = () => {
+    const navigate = useNavigate();
     const { items, removeItem, clearCart } = useCartStore();
+    const [isProcessingOrder, setIsProcessingOrder] = useState(false);
     
     const { data: products } = useQuery<Product[]>({
         queryKey: ['products'],
@@ -22,6 +25,22 @@ export const ShoppingCart: React.FC = () => {
             const product = getProduct(item.productId);
             return total + (product?.price || 0) * item.quantity;
         }, 0);
+    };
+
+    const handleProceedToPayment = async () => {
+        try {
+            setIsProcessingOrder(true);
+            
+            // Navegar directamente a la página de pago
+            // La página de pago se encargará de crear la orden
+            navigate('/payment');
+            
+        } catch (error) {
+            console.error('Error al proceder al pago:', error);
+            alert('Error al proceder al pago. Por favor, inténtalo de nuevo.');
+        } finally {
+            setIsProcessingOrder(false);
+        }
     };
 
     if (!products) return null;
@@ -81,14 +100,19 @@ export const ShoppingCart: React.FC = () => {
                             <button
                                 onClick={() => clearCart()}
                                 className="px-4 py-2 text-red-600 border border-red-600 rounded hover:bg-red-50"
+                                disabled={isProcessingOrder}
                             >
                                 Vaciar carrito
                             </button>
                             <button
-                                onClick={() => {/* Implementar checkout */}}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                onClick={handleProceedToPayment}
+                                disabled={isProcessingOrder}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                Proceder al pago
+                                {isProcessingOrder && (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                )}
+                                {isProcessingOrder ? 'Procesando...' : 'Proceder al pago'}
                             </button>
                         </div>
                     </div>

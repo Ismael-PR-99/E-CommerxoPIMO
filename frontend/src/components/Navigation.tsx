@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore, useCartStore } from '../store';
+import { useAuth } from '../context/AuthContext';
+import { useCartStore } from '../store';
 
 export const Navigation: React.FC = () => {
-    const { user, logout } = useAuthStore();
+    const { user, logout } = useAuth();
     const { items } = useCartStore();
     const navigate = useNavigate();
 
@@ -15,36 +16,51 @@ export const Navigation: React.FC = () => {
     const cartItemsCount = items.reduce((total, item) => total + item.quantity, 0);
 
     return (
-        <nav className="bg-white shadow-lg">
+        <nav className="bg-brand-600 text-white shadow-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
-                    <div className="flex">
+                    <div className="flex items-center">
                         <Link
                             to="/"
-                            className="flex-shrink-0 flex items-center text-xl font-bold text-blue-600"
+                            className="flex-shrink-0 flex items-center text-xl font-bold text-white hover:opacity-90"
                         >
                             E-CommerxoPIMO
                         </Link>
 
-                        <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <div className="hidden sm:ml-8 sm:flex sm:space-x-2">
                             <Link
                                 to="/products"
-                                className="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600"
+                                className="inline-flex items-center px-3 py-2 rounded-md text-brand-100 hover:bg-brand-700 hover:text-white transition"
                             >
                                 Productos
                             </Link>
-                            
+                            {user && (
+                                <>
+                                    <Link
+                                        to="/my-orders"
+                                        className="inline-flex items-center px-3 py-2 rounded-md text-brand-100 hover:bg-brand-700 hover:text-white transition"
+                                    >
+                                        Mis Pedidos
+                                    </Link>
+                                    <Link
+                                        to="/recommendations"
+                                        className="inline-flex items-center px-3 py-2 rounded-md text-brand-100 hover:bg-brand-700 hover:text-white transition"
+                                    >
+                                        Recomendaciones
+                                    </Link>
+                                </>
+                            )}
                             {user && user.role === 'ADMIN' && (
                                 <>
                                     <Link
                                         to="/dashboard"
-                                        className="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600"
+                                        className="inline-flex items-center px-3 py-2 rounded-md text-brand-100 hover:bg-brand-700 hover:text-white transition"
                                     >
                                         Dashboard
                                     </Link>
                                     <Link
                                         to="/admin/products"
-                                        className="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600"
+                                        className="inline-flex items-center px-3 py-2 rounded-md text-brand-100 hover:bg-brand-700 hover:text-white transition"
                                     >
                                         Gestionar Productos
                                     </Link>
@@ -56,7 +72,7 @@ export const Navigation: React.FC = () => {
                     <div className="flex items-center">
                         <Link
                             to="/cart"
-                            className="relative p-2 text-gray-600 hover:text-blue-600 mr-4"
+                            className="relative p-2 text-brand-100 hover:text-white mr-4"
                         >
                             <span className="sr-only">Carrito</span>
                             <svg
@@ -71,7 +87,7 @@ export const Navigation: React.FC = () => {
                                 <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
                             {cartItemsCount > 0 && (
-                                <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-blue-600 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
+                                <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-white text-brand-700 border border-brand-200 rounded-full h-5 w-5 flex items-center justify-center text-xs">
                                     {cartItemsCount}
                                 </span>
                             )}
@@ -79,10 +95,10 @@ export const Navigation: React.FC = () => {
 
                         {user ? (
                             <div className="ml-3 relative flex items-center space-x-4">
-                                <span className="text-gray-700">{user.fullName}</span>
+                                <span className="text-brand-100">{user.fullName}</span>
                                 <button
                                     onClick={handleLogout}
-                                    className="text-gray-600 hover:text-red-600"
+                                    className="text-brand-100 hover:text-white hover:underline"
                                 >
                                     Cerrar sesión
                                 </button>
@@ -91,13 +107,13 @@ export const Navigation: React.FC = () => {
                             <div className="space-x-4">
                                 <Link
                                     to="/login"
-                                    className="text-gray-600 hover:text-blue-600"
+                                    className="text-brand-100 hover:text-white hover:underline"
                                 >
                                     Iniciar sesión
                                 </Link>
                                 <Link
                                     to="/register"
-                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                    className="btn"
                                 >
                                     Registrarse
                                 </Link>

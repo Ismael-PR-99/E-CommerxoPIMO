@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
-import { fmtCurrency, fmtDate } from '../utils/format';
+import { fmtCurrency } from '../utils/format';
 
 const Dashboard: React.FC = () => {
   const { products, orders } = useStore();

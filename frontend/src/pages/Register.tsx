@@ -4,14 +4,16 @@ import { useAuth } from '../context/AuthContext';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
+    phone: '+34123456789',
     email: '',
     password: '',
     confirmPassword: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,18 +34,25 @@ const Register: React.FC = () => {
       return;
     }
 
+    if (formData.password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // Simular registro para demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      login('demo-token', { 
-        id: 1, 
-        email: formData.email, 
-        fullName: formData.fullName 
+      await register({
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone
       });
-      navigate('/dashboard');
+      // Redirigir a Home para que use la lógica de redirección por rol
+      navigate('/');
     } catch (error) {
       console.error('Registration failed:', error);
-      setError('Error al crear la cuenta. Intenta de nuevo.');
+      setError(error instanceof Error ? error.message : 'Error al crear la cuenta. Intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
@@ -102,15 +111,56 @@ const Register: React.FC = () => {
                 fontWeight: '500',
                 color: '#374151'
               }}>
-                Nombre completo
+                Nombre
               </label>
               <input
                 type="text"
-                name="fullName"
-                value={formData.fullName}
+                name="firstName"
+                value={formData.firstName}
                 onChange={handleChange}
-                className="input-field"
-                placeholder="Tu nombre completo"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #d1d5db',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  position: 'relative',
+                  zIndex: 10
+                }}
+                placeholder="Nombre"
+                required
+              />
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>
+                Apellido
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #d1d5db',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  position: 'relative',
+                  zIndex: 10
+                }}
+                placeholder="Apellido"
                 required
               />
             </div>
@@ -130,7 +180,17 @@ const Register: React.FC = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="input-field"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #d1d5db',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  position: 'relative',
+                  zIndex: 10
+                }}
                 placeholder="tu@email.com"
                 required
               />
@@ -151,8 +211,49 @@ const Register: React.FC = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="input-field"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #d1d5db',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  position: 'relative',
+                  zIndex: 10
+                }}
                 placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>
+                Teléfono
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #d1d5db',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  position: 'relative',
+                  zIndex: 10
+                }}
+                placeholder="+34123456789"
                 required
               />
             </div>
@@ -172,7 +273,17 @@ const Register: React.FC = () => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="input-field"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #d1d5db',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  position: 'relative',
+                  zIndex: 10
+                }}
                 placeholder="••••••••"
                 required
               />
